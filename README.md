@@ -1,4 +1,4 @@
-# Carve Canvas v0.2.2
+# Bristle v0.2.2
 
 ## What is it?
 
