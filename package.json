@@ -1,11 +1,12 @@
 {
-  "name": "carvecanvas",
+  "name": "bristle",
   "version": "0.2.2",
   "description": "A small JS library for drawing dynamic paths into html canvas elements.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/njweb/carvecanvas"
+    "url": "https://github.com/njweb/bristle"
   },
+  "author": "Nick Jenkins",
   "licenses": [
     {
       "type": "MIT",
