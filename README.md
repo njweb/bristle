@@ -11,14 +11,13 @@
    **Note: For the path functions, 2D vectors are represented as two element arrays, so \[x, y\]**
 
 ```javascript
-import carve from 'carve-canvas'
 let canvasCtx = document.querySelector('#my-canvas').getContext('2d');
-let carveObj = carve(canvasCtx);
+let bristleObj = bristle(canvasCtx);
 
 canvasCtx.beginPath();
 
-carveObj.sequence((carveCtx) => {
-    carveCtx
+bristleObj.sequence((bristleCtx) => {
+    bristleCtx
         .moveTo([10, 10])
         .lineTo([50, 50) 
         .lineTo([50, 10])
@@ -33,13 +32,12 @@ canvasCtx.fill();
    Now, let's add some transformations that are applied to subsequent input operations.
 
 ```javascript
-import carve from 'carve-canvas'
 let canvasCtx = document.querySelector('#my-canvas').getContext('2d');
-let carveObj = carve(canvasCtx);
+let bristleObj = bristle(canvasCtx);
 
-carveObj.sequence((carveCtx) => {
-    // The carve 'context' object has a transform stack we can push offsets to.
-    carveCtx.pushTransform([0, 10])
+bristleObj.sequence((bristleCtx) => {
+    // The bristle 'context' object has a transform stack we can push offsets to.
+    bristleCtx.pushTransform([0, 10])
     .moveTo([0, -10])
     .lineTo([-10, 0])
     
@@ -55,7 +53,7 @@ carveObj.sequence((carveCtx) => {
     .lineTo([10, 0])
     .commit((canvasCtx, trigger) => { //we can pass a function to .commit
             // The predicate we pass to .commit gets the original CanvasRenderingContext2D
-            //   object we passed in when we created carveCtx.
+            //   object we passed in when we created bristleCtx.
             canvasCtx.beginPath();
     
             // By calling this trigger function, all our stored instructions 
@@ -73,17 +71,16 @@ carveObj.sequence((carveCtx) => {
    And now, we can break our paths up into sequences that can be chained together
    
 ```javascript
-import carve from 'carve-canvas'
 let canvasCtx = document.querySelector('#my-canvas').getContext('2d');
-let carveObj = carve(canvasCtx);
+let bristleObj = bristle(canvasCtx);
 
-carveObj.sequence((carveCtx) =>
-    carveCtx.pushTransform([-40, 0])
+bristleObj.sequence((bristleCtx) =>
+    bristleCtx.pushTransform([-40, 0])
         .moveTo([-10, 0])
         // The .sequence method takes a handler function
         .sequence((seqCtx) => {
             // The first argument passed into the
-            //   sequence handler funtion is our carveCtx object
+            //   sequence handler funtion is our bristleCtx object
             //   unless that behavior has been overridden
 
             seqCtx.pushTransform([40, 40])
