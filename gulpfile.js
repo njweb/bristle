@@ -26,9 +26,9 @@ gulp.task('build_libs', function () {
     ]
   }).pipe(source(pkg.name + '.js'))
     .pipe(gulp.dest('./lib'))
-    // .pipe(rename(pkg.name + '.min.js'))
-    // .pipe(streamify(uglify()))
-    // .pipe(gulp.dest('./lib'));
+    .pipe(rename(pkg.name + '.min.js'))
+    .pipe(streamify(uglify()))
+    .pipe(gulp.dest('./lib'));
 });
 
 gulp.task('spec', function () {
