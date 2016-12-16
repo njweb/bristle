@@ -128,7 +128,7 @@ let passthroughProjection = (out, p) => {
   return out;
 };
 
-let carve = (canvasContext, configuration) => {
+let bristle = (canvasContext, configuration) => {
 
   if(configuration !== undefined && typeof  configuration !== 'object'){
     throw TypeError('configuration must be an object');
@@ -171,19 +171,19 @@ let carve = (canvasContext, configuration) => {
     return this;
   };
 
-  let carveCtx = applySequenceConfiguration(
+  let bristleCtx = applySequenceConfiguration(
     Object.create(Object.assign({}, {commit: commitSequence}, sequenceActions)),
     configuration);
 
   return {
     sequence: (predicate, state) => {
-      predicate(carveCtx, state);
-      return carveCtx.instructions;
+      predicate(bristleCtx, state);
+      return bristleCtx.instructions;
     },
     commit
   };
 };
 
-export {carve};
+export {bristle};
 
-export default carve;
+export default bristle;
