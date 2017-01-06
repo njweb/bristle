@@ -3,7 +3,6 @@ import {moveTo, lineTo, quadTo, bezierTo} from './path';
 import {push, pop, apply, merge} from './transform';
 import {instructions} from './instructions';
 
-
 let applySequenceConfiguration = function applySequenceConfiguration(obj, configuration) {
   configuration = configuration || {};
 

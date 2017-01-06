@@ -54,6 +54,7 @@ gulp.task('build_min_lib', function () {
 });
 
 gulp.task('spec', function () {
+  process.env.BABEL_ENV = "test";
   return gulp.src(['./spec/*.spec.js'], {read: false})
     .pipe(mocha({reporter: 'min', compilers: {js: babelRegister}}));
 });
