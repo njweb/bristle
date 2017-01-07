@@ -1,5 +1,4 @@
 let expect = require('chai').expect;
-let _ = require('lodash');
 
 import {push, pop, merge, apply} from '../src/transform';
 
@@ -21,6 +20,22 @@ describe('Push', () => {
     let offset = [22, 16];
     push(arr, index, offset);
     expect(arr[index + 1]).to.equal(offset[1]);
+  });
+
+  [null, NaN, 'abc', [5], {a: 5}, 10].forEach((v) => {
+    it('should throw an error if ' + v + ' is used as the offset argument', () => {
+     expect(push.bind(null, [], 5, v)).to.throw(TypeError);
+    });
+
+    if(typeof v !== 'number' && !Number.isNaN(v)) {
+      it('should throw an error if ' + v + 'is used as the x value', () => {
+        expect(push.bind(null, [], 5, [v, 12])).to.throw(TypeError);
+      });
+
+      it('should throw an error if ' + v + 'is used as the y value', () => {
+        expect(push.bind(null, [], 5, [12, v])).to.throw(TypeError);
+      });
+    }
   });
 });
 

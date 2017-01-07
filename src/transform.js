@@ -1,4 +1,12 @@
+import {validatePoint} from './validate';
+
 let push = (outTransformArray, index, offset) => {
+
+  if(__DEV__){
+    let result;
+    if(result = validatePoint(offset)) throw TypeError('offset: ' + result);
+  }
+
   outTransformArray[index] = offset[0];
   outTransformArray[index + 1] = offset[1];
   return index + 2;
