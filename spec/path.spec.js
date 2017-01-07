@@ -1,6 +1,8 @@
 let expect = require('chai').expect;
 let _ = require('lodash');
 
+global.__DEV__ = true;
+
 import {moveTo, lineTo, quadTo, bezierTo} from '../src/path';
 import {instructionCodes} from '../src/codes';
 
@@ -41,6 +43,26 @@ describe('Move To', () => {
     let arr = [];
     moveTo(arr, index);
     expect(arr[index + 2]).to.equal(0);
+  });
+  it('should throw an error if the point value provided is not an array', () => {
+    expect(moveTo.bind(null, [], 2, null)).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 3, 'abc')).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 4, 123)).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 5, {a: 'b'})).to.throw(TypeError);
+  });
+  it('should throw an error if the point x value is not a number', () => {
+    expect(moveTo.bind(null, [], 2, [null, 10])).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 2, [NaN, 10])).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 2, ['abc', 10])).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 2, [[7], 10])).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 2, [{}, 10])).to.throw(TypeError);
+  });
+  it('should throw an error if the point y value is not a number', () => {
+    expect(moveTo.bind(null, [], 2, [10, null])).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 2, [10, NaN])).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 2, [10, 'abc'])).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 2, [10, [7]])).to.throw(TypeError);
+    expect(moveTo.bind(null, [], 2, [10, {}])).to.throw(TypeError);
   });
 });
 
@@ -87,7 +109,7 @@ describe('Line To', () => {
 describe('Quad To', () => {
   it('should return an integer 5 larger than the index passed in', () => {
     let index = 5;
-    expect(quadTo([], index, [], [])).to.equal(index + 5);
+    expect(quadTo([], index, [1, 2], [3, 4])).to.equal(index + 5);
   });
   it('should place the code for quadTo in the instruction array at the index\'s value', () => {
     let index = 12;
@@ -135,12 +157,12 @@ describe('Quad To', () => {
 describe('Bezier To', () => {
   it('should return an integer 7 larger than the index passed in', () => {
     let index = 5;
-    expect(bezierTo([], index, [], [], [])).to.equal(index + 7);
+    expect(bezierTo([], index, [1, 2], [3, 4], [5, 6])).to.equal(index + 7);
   });
   it('should place the code for bezierTo in the instruction array at the index\'s value', () => {
     let index = 5;
     let arr = [];
-    bezierTo(arr, index, [], [], []);
+    bezierTo(arr, index, [1, 2], [3, 4], [5, 6]);
     expect(arr[index]).to.equal(instructionCodes.bezierTo);
   });
 
