@@ -1,8 +1,6 @@
 let expect = require('chai').expect;
 let _ = require('lodash');
 
-global.__DEV__ = true;
-
 import {moveTo, lineTo, quadTo, bezierTo} from '../src/path';
 import {instructionCodes} from '../src/codes';
 

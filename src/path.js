@@ -3,7 +3,7 @@ import {validatePoint} from './validate';
 
 let moveTo = (outInstructions, index, point = [0, 0]) => {
 
-  if(__DEV__){
+  if(process.env.NODE_ENV !== "production"){
     let result;
     if(result = validatePoint(point)) throw TypeError(result);
   }
@@ -15,7 +15,7 @@ let moveTo = (outInstructions, index, point = [0, 0]) => {
 };
 let lineTo = (outInstructions, index, point = [0, 0]) => {
 
-  if(__DEV__){
+  if(process.env.NODE_ENV !== "production"){
     let result;
     if(result = validatePoint(point)) throw TypeError(result);
   }
@@ -27,7 +27,7 @@ let lineTo = (outInstructions, index, point = [0, 0]) => {
 };
 let quadTo = (outInstructions, index, control, point) => {
 
-  if(__DEV__){
+  if(process.env.NODE_ENV !== "production"){
     let result;
     if(result = validatePoint(control)) throw TypeError('control: ' + result);
     if(result = validatePoint(point)) throw TypeError('point: ' + result);
@@ -43,7 +43,7 @@ let quadTo = (outInstructions, index, control, point) => {
 
 let bezierTo = (outInstructions, index, controlA, controlB, point) => {
 
-  if(__DEV__){
+  if(process.env.NODE_ENV !== "production"){
     let result;
     if(result = validatePoint(controlA)) throw TypeError('controlA: ' + result);
     if(result = validatePoint(controlB)) throw TypeError('controlB: ' + result);

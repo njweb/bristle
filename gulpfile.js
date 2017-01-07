@@ -26,7 +26,7 @@ gulp.task('build_lib', function () {
       }),
       replace({
         exclude: 'node_modules/**',
-        __DEV__: true
+        "process.env.NODE_ENV": JSON.stringify('development')
       })
     ]
   }).pipe(source(pkg.name + '.js'))
@@ -45,7 +45,7 @@ gulp.task('build_min_lib', function () {
       }),
       replace({
         exclude: 'node_modules/**',
-        __DEV__: false
+        "process.env.NODE_ENV": JSON.stringify('production')
       })
     ]
   }).pipe(source(pkg.name + '.min.js'))

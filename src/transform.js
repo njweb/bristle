@@ -2,7 +2,7 @@ import {validatePoint} from './validate';
 
 let push = (outTransformArray, index, offset) => {
 
-  if(__DEV__){
+  if(process.env.NODE_ENV !== "production"){
     let result;
     if(result = validatePoint(offset)) throw TypeError('offset: ' + result);
   }
