@@ -1,4 +1,4 @@
-# Bristle v0.2.2
+# Bristle v0.2.3
 
 ## What is it?
 
