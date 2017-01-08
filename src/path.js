@@ -1,7 +1,7 @@
 import {instructionCodes} from './codes.js';
 import {validatePoint} from './validate';
 
-let moveTo = (outInstructions, index, point = [0, 0]) => {
+let moveTo = (outInstructions, index, point) => {
 
   if(process.env.NODE_ENV !== "production"){
     let result;
@@ -13,7 +13,7 @@ let moveTo = (outInstructions, index, point = [0, 0]) => {
   outInstructions[index + 2] = point[1];
   return index += 3;
 };
-let lineTo = (outInstructions, index, point = [0, 0]) => {
+let lineTo = (outInstructions, index, point) => {
 
   if(process.env.NODE_ENV !== "production"){
     let result;

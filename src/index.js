@@ -26,14 +26,14 @@ let capInstructions = (instructions, iIndex) => {
 
 let sequenceActions = {
   cache: [[0, 0], [0, 0], [0, 0]],
-  moveTo(p) {
+  moveTo(p = [0, 0]) {
     this.iIndex = moveTo(
       this.instructions,
       this.iIndex,
       this.applyTransform(this.cache[0], this.getTransform(this.cache[0]), p));
     return this;
   },
-  lineTo(p) {
+  lineTo(p = [0, 0]) {
     this.iIndex = lineTo(
       this.instructions,
       this.iIndex,

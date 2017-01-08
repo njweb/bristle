@@ -7,13 +7,13 @@ import {instructionCodes} from '../src/codes';
 describe('Move To', () => {
   it('should return an integer 3 larger than the index passed in', () => {
     let index = 5;
-    let result = moveTo([], index);
+    let result = moveTo([], index, [1, 2]);
     expect(result).to.equal(index + 3);
   });
   it('should place the code for moveTo in the instructions array at the provided index', () => {
     let index = 5;
     let arr = [];
-    moveTo(arr, index);
+    moveTo(arr, index, [1, 2]);
     expect(arr[index]).to.equal(instructionCodes.moveTo);
   });
   it('should place the first value of the point array into the instructions array at index + 1', () => {
@@ -29,18 +29,6 @@ describe('Move To', () => {
     let point = [4, 10];
     moveTo(arr, index, point);
     expect(arr[index + 2]).to.equal(point[1]);
-  });
-  it('should put a 0 at index + 1 in the instructions array if no point value is provided', () => {
-    let index = 6;
-    let arr = [];
-    moveTo(arr, index);
-    expect(arr[index + 1]).to.equal(0);
-  });
-  it('should put a 0 at index + 2 in the instructions array if no point value is provided', () => {
-    let index = 2;
-    let arr = [];
-    moveTo(arr, index);
-    expect(arr[index + 2]).to.equal(0);
   });
   it('should throw an error if the point value provided is not an array', () => {
     expect(moveTo.bind(null, [], 2, null)).to.throw(TypeError);
@@ -67,13 +55,13 @@ describe('Move To', () => {
 describe('Line To', () => {
   it('should return an integer 3 larger than the index passed in', () => {
     let index = 5;
-    let result = lineTo([], index);
+    let result = lineTo([], index, [1, 2]);
     expect(result).to.equal(index + 3);
   });
   it('should place the code for lineTo in the instructions array at the provided index', () => {
     let index = 5;
     let arr = [];
-    lineTo(arr, index);
+    lineTo(arr, index, [1, 2]);
     expect(arr[index]).to.equal(instructionCodes.lineTo);
   });
   it('should place the first value of the point array into the instructions array at index + 1', () => {
@@ -89,18 +77,6 @@ describe('Line To', () => {
     let point = [4, 10];
     lineTo(arr, index, point);
     expect(arr[index + 2]).to.equal(point[1]);
-  });
-  it('should put a 0 at index + 1 in the instructions array if no point value is provided', () => {
-    let index = 6;
-    let arr = [];
-    lineTo(arr, index);
-    expect(arr[index + 1]).to.equal(0);
-  });
-  it('should put a 0 at index + 2 in the instructions array if no point value is provided', () => {
-    let index = 2;
-    let arr = [];
-    lineTo(arr, index);
-    expect(arr[index + 2]).to.equal(0);
   });
 });
 

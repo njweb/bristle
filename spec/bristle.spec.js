@@ -139,6 +139,12 @@ describe('Bristle', () => {
           expect(result.slice(1, 3)).to.deep.equal(applyTransform([], transform, point));
         });
       });
+      it('should use [0, 0] as the point value if no point argument is provided', () => {
+        myCarveObj.sequence((ctx) => {
+          let result = ctx.moveTo().getInstructions();
+          expect(result.slice(1, 3)).to.deep.equal([0, 0]);
+        });
+      })
     });
 
     describe('Line To', () => {
@@ -164,6 +170,12 @@ describe('Bristle', () => {
         myCarveObj.sequence((ctx) => {
           let result = ctx.pushTransform(transform).lineTo(point).getInstructions();
           expect(result.slice(1, 3)).to.deep.equal(applyTransform([], transform, point));
+        });
+      });
+      it('should use [0, 0] as the point value if no point argument is provided', () => {
+        myCarveObj.sequence((ctx) => {
+          let result = ctx.lineTo().getInstructions();
+          expect(result.slice(1, 3)).to.deep.equal([0, 0]);
         });
       });
     });
