@@ -183,6 +183,4 @@ let bristle = (canvasContext, configuration) => {
   };
 };
 
-export {bristle};
-
 export default bristle;

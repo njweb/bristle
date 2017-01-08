@@ -37,7 +37,7 @@ gulp.task('build_min_lib', function () {
   return rollup({
     entry: './src/index.js',
     format: 'umd',
-    exports: 'named',
+    exports: 'default',
     moduleName: 'bristle',
     plugins: [
       babel({
