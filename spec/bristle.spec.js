@@ -8,7 +8,7 @@ import {canvasRenderingContext2DMock} from './canvasRenderingContext2D.mock.js';
 let mockCanvasCtx2D = canvasRenderingContext2DMock();
 let addPoints = (a, b) => [a[0] + b[0], a[1] + b[1]];
 
-describe('Carve', () => {
+describe('Bristle', () => {
 
   it('should be a function', () => {
     expect(carve).to.be.a('function');
