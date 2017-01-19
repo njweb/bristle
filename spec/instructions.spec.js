@@ -1,5 +1,4 @@
 let expect = require('chai').expect;
-let _ = require('lodash');
 
 import {canvasRenderingContext2DMock} from './canvasRenderingContext2D.mock'
 import {instructions} from '../src/instructions'
@@ -241,6 +240,96 @@ describe('Instructor', () => {
       expect(mockContext.storage[0].point).to.deep.equal(remapper([], point));
     });
 
+  });
+
+  describe('Arc', () => {
+    it('should return a number 7 larger than the instruction index passed in', () => {
+      let index = 12;
+      expect(instructorInstance.arc([], index)).to.equal(index + 7);
+    });
+    it('should pass the x and y values in the instructions through the coordinate mapping function', () => {
+      let point = [5, 10];
+      let radius = 13;
+      let startEndAngle = [0.4, 0.5];
+      let isCCW = 0;
+      let instructions = [0].concat(point, radius, startEndAngle, isCCW);
+
+      instructorInstance.arc(instructions, 0);
+
+      expect(remapStore[0]).to.deep.equal(remapper([], point));
+    });
+    it('should call the arc function on the canvas context 2D object', () => {
+      let point = [5, 10];
+      let radius = 13;
+      let startAngle = 0.4;
+      let endAngle = 0.5;
+      let isCCW = 0;
+      let instructions = [0].concat(point, radius, startAngle, endAngle, isCCW);
+
+      instructorInstance.arc(instructions, 0);
+
+      expect(mockContext.storage[0].type).to.equal('arc');
+    });
+    it('should pass the point values to the arc function', () => {
+      let point = [5, 10];
+      let radius = 13;
+      let startAngle = 0.4;
+      let endAngle = 0.5;
+      let isCCW = 0;
+      let instructions = [0].concat(point, radius, startAngle, endAngle, isCCW);
+
+      instructorInstance.arc(instructions, 0);
+
+      expect(mockContext.storage[0].point).to.deep.equal(remapper([], point));
+    });
+    it('should pass the radius value to the arc function', () => {
+      let point = [5, 10];
+      let radius = 13;
+      let startAngle = 0.4;
+      let endAngle = 0.5;
+      let isCCW = 0;
+      let instructions = [0].concat(point, radius, startAngle, endAngle, isCCW);
+
+      instructorInstance.arc(instructions, 0);
+
+      expect(mockContext.storage[0].radius).to.equal(radius);
+    });
+    it('should pass the startAngle value to the arc function', () => {
+      let point = [5, 10];
+      let radius = 13;
+      let startAngle = 0.4;
+      let endAngle = 0.5;
+      let isCCW = 0;
+      let instructions = [0].concat(point, radius, startAngle, endAngle, isCCW);
+
+      instructorInstance.arc(instructions, 0);
+
+      expect(mockContext.storage[0].startAngle).to.equal(startAngle)
+    });
+    it('should pass the endAngle value to the arc function', () => {
+      let point = [5, 10];
+      let radius = 13;
+      let startAngle = 0.4;
+      let endAngle = 0.5;
+      let isCCW = 0;
+      let instructions = [0].concat(point, radius, startAngle, endAngle, isCCW);
+
+      instructorInstance.arc(instructions, 0);
+
+      expect(mockContext.storage[0].endAngle).to.equal(endAngle);
+    });
+    it('should pass the isCCW value to the arc function', () => {
+      let point = [5, 10];
+      let radius = 13;
+      let startAngle = 0.4;
+      let endAngle = 0.5;
+      let isCCW = 0;
+      let instructions = [0].concat(point, radius, startAngle, endAngle, isCCW);
+
+      instructorInstance.arc(instructions, 0);
+
+      expect(mockContext.storage[0].isCCW).to.equal(isCCW !== 0);
+    });
   });
 
 });
