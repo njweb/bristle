@@ -3,7 +3,8 @@ const instructionCodes = {
   moveTo: 0,
   lineTo: 1,
   bezierTo: 2,
-  quadTo: 3
+  quadTo: 3,
+  arc: 4
 };
 
 export {instructionCodes};
