@@ -21,6 +21,9 @@ let mock = () => {
     },
     quadraticCurveTo: function (xC, yC, x, y) {
       this.storage.push({type: 'quadraticCurveTo', control: [xC, yC], point: [x, y]});
+    },
+    arc: function (x, y, radius, startAngle, endAngle, isCCW) {
+      this._storage.push({type: 'arc', point: [x, y], radius, startAngle, endAngle, isCCW});
     }
   };
 };
