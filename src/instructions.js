@@ -43,13 +43,13 @@ let instructions = (canvasContext, remapCoordinates) => {
     },
     arc: (instructions, index) => {
       let point = remapCoordinates(cache[0], instructions.slice(index + 1, index + 3));
-      let isCCW = instructions[6] !== 0;
+      let isCCW = instructions[index + 6] !== 0;
       canvasContext.arc(
         point[0],
         point[1],
-        instructions[3],
-        instructions[4],
-        instructions[5],
+        instructions[index + 3],
+        instructions[index + 4],
+        instructions[index + 5],
         isCCW
       );
       return index + 7;
