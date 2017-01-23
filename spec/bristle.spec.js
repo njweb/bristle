@@ -417,7 +417,6 @@ describe('Bristle', () => {
         expect(wasCalled).to.be.true;
       });
       it('should provide the canvas context object to a predicate function', () => {
-        let predicate = () => {wasCalled = true;};
         myCarveObj.sequence((ctx) => {
           ctx.commit((canvasCtx) => {
             expect(canvasCtx).to.equal(mockCanvasCtx2D);
