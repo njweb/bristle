@@ -1,5 +1,5 @@
 import {instructionCodes} from './codes.js';
-import {validatePoint} from './validate';
+import {validatePoint, isNumber} from './validate';
 
 let moveTo = (outInstructions, index, point) => {
 
@@ -60,6 +60,26 @@ let bezierTo = (outInstructions, index, controlA, controlB, point) => {
   return index + 7;
 };
 
-export {moveTo, lineTo, quadTo, bezierTo}
+let arc = (outInstructions, index, point, radius, startAngle, endAngle, isCCW) => {
 
-export default {moveTo, lineTo, quadTo, bezierTo}
+  if(process.env.NODE_ENV !== 'production') {
+    let result;
+    if(result = validatePoint(point)) throw TypeError('point: ' + result);
+    if(!isNumber(radius)) throw TypeError('radius must be a number');
+    if(!isNumber(startAngle)) throw TypeError('start angle must be a number');
+    if(!isNumber(endAngle)) throw TypeError('end angle must be a number');
+  }
+
+  outInstructions[index] = instructionCodes.arc;
+  outInstructions[index + 1] = point[0];
+  outInstructions[index + 2] = point[1];
+  outInstructions[index + 3] = radius;
+  outInstructions[index + 4] = startAngle;
+  outInstructions[index + 5] = endAngle;
+  outInstructions[index + 6] = isCCW === true ? 1 : 0;
+  return index + 7;
+};
+
+export {moveTo, lineTo, quadTo, bezierTo, arc}
+
+export default {moveTo, lineTo, quadTo, bezierTo, arc}
