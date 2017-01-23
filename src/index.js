@@ -163,6 +163,7 @@ let bristle = (canvasContext, configuration) => {
   operations[instructionCodes.lineTo] = builtInstructions.lineTo;
   operations[instructionCodes.quadTo] = builtInstructions.quadTo;
   operations[instructionCodes.bezierTo] = builtInstructions.bezierTo;
+  operations[instructionCodes.arc] = builtInstructions.arc;
 
   let commit = (instructions) => {
     let iIndex = 0;
