@@ -1,6 +1,6 @@
 {
   "name": "bristle",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "A small JS library for drawing dynamic paths into html canvas elements.",
   "repository": {
     "type": "git",
