@@ -1,5 +1,5 @@
 import {instructionCodes} from './codes';
-import {moveTo, lineTo, quadTo, bezierTo} from './path';
+import {moveTo, lineTo, quadTo, bezierTo, arc} from './path';
 import {push, pop, apply, merge} from './transform';
 import {instructions} from './instructions';
 
@@ -55,6 +55,17 @@ let sequenceActions = {
       this.applyTransform(this.cache[0], this.getTransform(this.cache[0]), cA),
       this.applyTransform(this.cache[1], this.getTransform(this.cache[1]), cB),
       this.applyTransform(this.cache[2], this.getTransform(this.cache[2]), p));
+    return this;
+  },
+  arc(p, radius, aStart, aEnd, isCCW) {
+    this.iIndex = arc(
+      this.instructions,
+      this.iIndex,
+      this.applyTransform(this.cache[0], this.getTransform(this.cache[0]), p),
+      radius,
+      aStart,
+      aEnd,
+      isCCW);
     return this;
   },
 
@@ -129,14 +140,14 @@ let passthroughProjection = (out, p) => {
 
 let bristle = (canvasContext, configuration) => {
 
-  if(configuration !== undefined && typeof  configuration !== 'object'){
+  if (configuration !== undefined && typeof  configuration !== 'object') {
     throw TypeError('configuration must be an object');
   }
   configuration = configuration || {};
 
   let projection;
   if (configuration.projection !== undefined) {
-    if(typeof configuration.projection === 'function') {
+    if (typeof configuration.projection === 'function') {
       projection = configuration.projection;
     }
     else {

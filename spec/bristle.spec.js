@@ -247,6 +247,45 @@ describe('Bristle', () => {
       });
     });
 
+    describe('Arc', () => {
+      it('should return the sequence context', () => {
+        myCarveObj.sequence((ctx) => {expect(ctx.arc([0, 0], 0, 0, 0, false)).to.equal(ctx);});
+      });
+      it('should push the arc code to the returned instruction array', () => {
+        myCarveObj.sequence((ctx) => {
+          let result = ctx.arc([0, 0], 0, 0, 0, false).getInstructions();
+          expect(result[0]).to.equal(instructionCodes.arc);
+        });
+      });
+      it('should push the point value to the returned instruction array', () => {
+        let point = [-90, 12];
+        myCarveObj.sequence((ctx) => {
+          let result = ctx.arc(point, 0, 0, 0, false).getInstructions();
+          expect(result.slice(1, 1 + 2)).to.deep
+            .equal(point);
+        });
+      });
+      it('should offset the point with the current transform', () => {
+        let point = [35, -90];
+        let transform = [10, 20];
+        myCarveObj.sequence((ctx) => {
+          let result = ctx.pushTransform(transform).arc(point, 0, 0, 0, false).getInstructions();
+          expect(result.slice(1, 1 + 2)).to.deep
+            .equal(applyTransform([], transform, point));
+        });
+      });
+      it('should push the radius, startAngle, endAngle, and isCCW values into the instruction array', () => {
+        let radius = 12, startAngle = Math.PI, endAngle = Math.PI * 1.2, isCCW = true;
+        myCarveObj.sequence((ctx) => {
+          let result = ctx.arc([0, 0], radius, startAngle, endAngle, isCCW).getInstructions();
+          expect(result[3]).to.equal(radius);
+          expect(result[4]).to.equal(startAngle);
+          expect(result[5]).to.equal(endAngle);
+          expect(result[6]).to.equal(isCCW ? 1 : 0);
+        });
+      });
+    });
+
     describe('Sequence', () => {
       it('should return the sequence context', () => {
         myCarveObj.sequence((ctx) => {
