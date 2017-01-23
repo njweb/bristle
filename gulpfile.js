@@ -33,6 +33,21 @@ gulp.task('build_lib', function () {
     .pipe(gulp.dest('./lib'));
 });
 
+gulp.task('build_module_lib', function () {
+  return rollup({
+    entry: './src/index.js',
+    format: 'es',
+    exports: 'default',
+    moduleName: 'bristle',
+    plugins: [
+      babel({
+        exclude: 'node_modules/**'
+      })
+    ]
+  }).pipe(source(pkg.name + '.module.js'))
+    .pipe(gulp.dest('./lib'));
+});
+
 gulp.task('build_min_lib', function () {
   return rollup({
     entry: './src/index.js',
