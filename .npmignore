@@ -1,3 +1,8 @@
+#Project files
+gulpfile.js
+src
+spec
+
 # Logs
 logs
 *.log
@@ -35,9 +40,6 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
-
-#Spec Files
-spec
 
 #WebStorm Project Files
 .idea
