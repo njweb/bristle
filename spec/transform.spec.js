@@ -1,6 +1,6 @@
 let expect = require('chai').expect;
 
-import {push, pop, merge, apply} from '../src/transform';
+import {push, pop, merge, apply} from '../src/transforms';
 
 describe('Push', () => {
   it('should return a number larger by two than the index passed in', () => {

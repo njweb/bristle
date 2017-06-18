@@ -1,7 +1,7 @@
 let expect = require('chai').expect;
 
 import {canvasRenderingContext2DMock} from './canvasRenderingContext2D.mock'
-import {instructions} from '../src/instructions'
+import {instructions} from '../src/operations'
 
 let mockContext = canvasRenderingContext2DMock();
 let remapStore = [];
@@ -25,14 +25,14 @@ describe('Instructor', () => {
 
     it('should return a number 3 larger than the passed index value', () => {
       let index = 5;
-      expect(instructorInstance.moveTo([0, 10, 10], index)).to.equal(index + 3);
+      expect(instructorInstance.move([0, 10, 10], index)).to.equal(index + 3);
     });
 
     it('should send the two values after index through the remapCoordinates function', () => {
       let index = 0;
       let point = [10, 15];
       let instructions = [0].concat(point);
-      instructorInstance.moveTo(instructions, index);
+      instructorInstance.move(instructions, index);
       expect(remapStore[0]).to.deep.equal(remapper([], point));
     });
 
@@ -41,7 +41,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(point);
 
-      instructorInstance.moveTo(instructions, index);
+      instructorInstance.move(instructions, index);
 
       expect(mockContext.storage[0].type).to.equal('moveTo');
     });
@@ -52,7 +52,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(point);
 
-      instructorInstance.moveTo(instructions, index);
+      instructorInstance.move(instructions, index);
 
       expect(mockContext.storage[0].point).to.deep.equal(remapper([], point));
     });
@@ -62,14 +62,14 @@ describe('Instructor', () => {
 
     it('should return a number 3 larger than the passed in index', () => {
       let index = 6;
-      expect(instructorInstance.lineTo([], index)).to.equal(index + 3);
+      expect(instructorInstance.line([], index)).to.equal(index + 3);
     });
 
     it('should send the two values after index through the remapCoordinates function', () => {
       let index = 0;
       let point = [10, 15];
       let instructions = [0].concat(point);
-      instructorInstance.lineTo(instructions, index);
+      instructorInstance.line(instructions, index);
       expect(remapStore[0]).to.deep.equal(remapper([], point));
     });
 
@@ -78,7 +78,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(point);
 
-      instructorInstance.lineTo(instructions, index);
+      instructorInstance.line(instructions, index);
 
       expect(mockContext.storage[0].type).to.equal('lineTo');
     });
@@ -89,7 +89,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(point);
 
-      instructorInstance.lineTo(instructions, index);
+      instructorInstance.line(instructions, index);
 
       expect(mockContext.storage[0].point).to.deep.equal(remapper([], point));
     });
@@ -99,7 +99,7 @@ describe('Instructor', () => {
 
     it('should return a number 5 larger than the passed index value', () => {
       let index = 3;
-      expect(instructorInstance.quadTo([], index)).to.equal(index + 5);
+      expect(instructorInstance.quad([], index)).to.equal(index + 5);
     });
     it('should pass the control values after the index through the remapCoordinates function', () => {
       let index = 0;
@@ -107,7 +107,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(control, point);
 
-      instructorInstance.quadTo(instructions, index);
+      instructorInstance.quad(instructions, index);
 
       expect(remapStore[0]).to.deep.equal(remapper([], control));
     });
@@ -117,7 +117,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(control, point);
 
-      instructorInstance.quadTo(instructions, index);
+      instructorInstance.quad(instructions, index);
 
       expect(remapStore[1]).to.deep.equal(remapper([], point));
     });
@@ -127,7 +127,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(control, point);
 
-      instructorInstance.quadTo(instructions, index);
+      instructorInstance.quad(instructions, index);
 
       expect(mockContext.storage[0].type).to.equal('quadraticCurveTo');
     });
@@ -138,7 +138,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(control, point);
 
-      instructorInstance.quadTo(instructions, index);
+      instructorInstance.quad(instructions, index);
 
       expect(mockContext.storage[0].control).to.deep.equal(remapper([], control));
     });
@@ -149,7 +149,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(control, point);
 
-      instructorInstance.quadTo(instructions, index);
+      instructorInstance.quad(instructions, index);
 
       expect(mockContext.storage[0].point).to.deep.equal(remapper([], point));
     });
@@ -160,7 +160,7 @@ describe('Instructor', () => {
 
     it('should return an number 7 larger than the passed index value', () => {
       let index = 17;
-      expect(instructorInstance.bezierTo([], index)).to.equal(index + 7);
+      expect(instructorInstance.bezier([], index)).to.equal(index + 7);
     });
     it('should pass the first control values after the index through the coordinate remapper function', () => {
       let index = 0;
@@ -169,7 +169,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(controlA, controlB, point);
 
-      instructorInstance.bezierTo(instructions, index);
+      instructorInstance.bezier(instructions, index);
 
       expect(remapStore[0]).to.deep.equal(remapper([], controlA));
     });
@@ -180,7 +180,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(controlA, controlB, point);
 
-      instructorInstance.bezierTo(instructions, index);
+      instructorInstance.bezier(instructions, index);
 
       expect(remapStore[1]).to.deep.equal(remapper([], controlB));
     });
@@ -191,7 +191,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(controlA, controlB, point);
 
-      instructorInstance.bezierTo(instructions, index);
+      instructorInstance.bezier(instructions, index);
 
       expect(remapStore[2]).to.deep.equal(remapper([], point));
     });
@@ -202,7 +202,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(controlA, controlB, point);
 
-      instructorInstance.bezierTo(instructions, index);
+      instructorInstance.bezier(instructions, index);
 
       expect(mockContext.storage[0].type).to.equal('bezierCurveTo');
     });
@@ -213,7 +213,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(controlA, controlB, point);
 
-      instructorInstance.bezierTo(instructions, index);
+      instructorInstance.bezier(instructions, index);
 
       expect(mockContext.storage[0].controlA).to.deep.equal(remapper([], controlA));
     });
@@ -224,7 +224,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(controlA, controlB, point);
 
-      instructorInstance.bezierTo(instructions, index);
+      instructorInstance.bezier(instructions, index);
 
       expect(mockContext.storage[0].controlB).to.deep.equal(remapper([], controlB));
     });
@@ -235,7 +235,7 @@ describe('Instructor', () => {
       let point = [10, 15];
       let instructions = [0].concat(controlA, controlB, point);
 
-      instructorInstance.bezierTo(instructions, index);
+      instructorInstance.bezier(instructions, index);
 
       expect(mockContext.storage[0].point).to.deep.equal(remapper([], point));
     });

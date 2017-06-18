@@ -1,7 +1,7 @@
 let expect = require('chai').expect;
 let _ = require('lodash');
 
-import {moveTo, lineTo, quadTo, bezierTo} from '../src/path';
+import {moveTo, lineTo, quadTo, bezierTo} from '../src/instructions';
 import {instructionCodes} from '../src/codes';
 
 describe('Move To', () => {

@@ -1,12 +1,8 @@
-const instructionCodes = {
+export default {
   nil: -1,
-  moveTo: 0,
-  lineTo: 1,
-  bezierTo: 2,
-  quadTo: 3,
+  move: 0,
+  line: 1,
+  bezier: 2,
+  quad: 3,
   arc: 4
 };
-
-export {instructionCodes};
-
-export default instructionCodes;
