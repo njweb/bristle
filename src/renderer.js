@@ -1,16 +1,15 @@
 import codes from './codes'
-import operations from './operations'
+import operationsCanvas from './operations'
+import operationsSVG from './operationsSVG'
 
 const canvasRenderOperations = [];
-canvasRenderOperations[codes.move] = operations.move;
-canvasRenderOperations[codes.line] = operations.line;
-canvasRenderOperations[codes.quad] = operations.quad;
-canvasRenderOperations[codes.bezier] = operations.bezier;
-canvasRenderOperations[codes.arc] = operations.arc;
+canvasRenderOperations[codes.move] = operationsCanvas.move;
+canvasRenderOperations[codes.line] = operationsCanvas.line;
+canvasRenderOperations[codes.quad] = operationsCanvas.quad;
+canvasRenderOperations[codes.bezier] = operationsCanvas.bezier;
+canvasRenderOperations[codes.arc] = operationsCanvas.arc;
 
-const canvasRenderContext = { canvasRenderOperations };
-
-export default (configuration) => {
+export const canvasRenderer = (configuration) => {
   if(typeof configuration.projection !== 'function') {
     throw Error('Render configuration must provide a projection function');
   }
@@ -18,22 +17,55 @@ export default (configuration) => {
     throw Error('Render canvasContext2D must be an object');
   }
 
-  const renderContext = Object.assign({}, canvasRenderContext, {
+  const renderContext = {
     projection: configuration.projection,
     canvasContext2D: configuration.canvasContext2D
-  });
+  };
 
-  const bristleRenderer = function bristleRenderer(instructions) {
+  const canvasRenderer = function canvasRenderer(instructions) {
     let index = 1;
     while (index < instructions[0]) {
-      index = renderContext.canvasRenderOperations[instructions[index]](
+      index = canvasRenderOperations[instructions[index]](
         renderContext.projection,
         renderContext.canvasContext2D,
         instructions,
         index);
     }
-    return bristleRenderer;
+    return canvasRenderer;
   };
 
-  return bristleRenderer;
+  return canvasRenderer;
+};
+
+const svgRenderOperations = [];
+svgRenderOperations[codes.move] = operationsSVG.move;
+svgRenderOperations[codes.line] = operationsSVG.line;
+svgRenderOperations[codes.quad] = operationsSVG.quad;
+svgRenderOperations[codes.bezier] = operationsSVG.bezier;
+svgRenderOperations[codes.arc] = operationsSVG.arc;
+
+export const svgRenderer = (configuration) => {
+  if(typeof configuration.projection !== 'function') {
+    throw Error('Render configuration must provide a projection function');
+  }
+
+  const renderContext = {
+    projection: configuration.projection,
+    svgPathContainer: {
+      value: "",
+      pathTip: [0, 0]
+    }
+  };
+
+  return function bristleRenderer(instructions) {
+    let index = 1;
+    while (index < instructions[0]) {
+      index = svgRenderOperations[instructions[index]](
+        renderContext.projection,
+        renderContext.svgPathContainer,
+        instructions,
+        index);
+    }
+    return renderContext.svgPathContainer.value;
+  };
 };

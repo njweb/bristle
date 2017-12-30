@@ -1,160 +1,143 @@
-let expect = require('chai').expect;
-let _ = require('lodash');
+import {
+  bindSequencerToMove,
+  bindSequencerToLine,
+  bindSequencerToQuad,
+  bindSequencerToBezier,
+  bindSequencerToArc
+} from "../src2/pathInstructions"
+import instructionCodes from '../src2/instructionCodes'
 
-import {moveTo, lineTo, quadTo, bezierTo} from '../src/instructions';
-import {instructionCodes} from '../src/codes';
+const buildMockSequencer = () => ({
+  instructions: new Array(10).fill(0),
+  transform: [10, 20],
+  cache: [
+    [0, 0],
+    [0, 0],
+    [0, 0]
+  ]
+});
 
-describe('Move To', () => {
-  it('should return an integer 3 larger than the index passed in', () => {
-    let index = 5;
-    let result = moveTo([], index, [1, 2]);
-    expect(result).to.equal(index + 3);
-  });
-  it('should place the code for moveTo in the instructions array at the provided index', () => {
-    let index = 5;
-    let arr = [];
-    moveTo(arr, index, [1, 2]);
-    expect(arr[index]).to.equal(instructionCodes.moveTo);
-  });
-  it('should place the first value of the point array into the instructions array at index + 1', () => {
-    let index = 8;
-    let arr = [];
-    let point = [4, 10];
-    moveTo(arr, index, point);
-    expect(arr[index + 1]).to.equal(point[0]);
-  });
-  it('should place the second value of the point array into the instructions array at index + 2', () => {
-    let index = 2;
-    let arr = [];
-    let point = [4, 10];
-    moveTo(arr, index, point);
-    expect(arr[index + 2]).to.equal(point[1]);
-  });
-  it('should throw an error if the point value provided is not an array', () => {
-    expect(moveTo.bind(null, [], 2, null)).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 3, 'abc')).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 4, 123)).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 5, {a: 'b'})).to.throw(TypeError);
-  });
-  it('should throw an error if the point x value is not a number', () => {
-    expect(moveTo.bind(null, [], 2, [null, 10])).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 2, [NaN, 10])).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 2, ['abc', 10])).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 2, [[7], 10])).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 2, [{}, 10])).to.throw(TypeError);
-  });
-  it('should throw an error if the point y value is not a number', () => {
-    expect(moveTo.bind(null, [], 2, [10, null])).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 2, [10, NaN])).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 2, [10, 'abc'])).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 2, [10, [7]])).to.throw(TypeError);
-    expect(moveTo.bind(null, [], 2, [10, {}])).to.throw(TypeError);
+describe('path move binding function', () => {
+  it('should work', () => {
+    const mockSequencer = buildMockSequencer();
+    const move = bindSequencerToMove(mockSequencer);
+
+    move([4, 6]);
+
+    [
+      instructionCodes.move,
+      4 + 10,
+      6 + 20
+    ].forEach((value, index) => {
+      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    });
   });
 });
 
-describe('Line To', () => {
-  it('should return an integer 3 larger than the index passed in', () => {
-    let index = 5;
-    let result = lineTo([], index, [1, 2]);
-    expect(result).to.equal(index + 3);
-  });
-  it('should place the code for lineTo in the instructions array at the provided index', () => {
-    let index = 5;
-    let arr = [];
-    lineTo(arr, index, [1, 2]);
-    expect(arr[index]).to.equal(instructionCodes.lineTo);
-  });
-  it('should place the first value of the point array into the instructions array at index + 1', () => {
-    let index = 8;
-    let arr = [];
-    let point = [4, 10];
-    lineTo(arr, index, point);
-    expect(arr[index + 1]).to.equal(point[0]);
-  });
-  it('should place the second value of the point array into the instructions array at index + 2', () => {
-    let index = 2;
-    let arr = [];
-    let point = [4, 10];
-    lineTo(arr, index, point);
-    expect(arr[index + 2]).to.equal(point[1]);
+describe('path line binding function', () => {
+  it('should work', () => {
+    const mockSequencer = buildMockSequencer();
+    const line = bindSequencerToLine(mockSequencer);
+
+    line([4, 6]);
+
+    [
+      instructionCodes.line,
+      4 + 10,
+      6 + 20
+    ].forEach((value, index) => {
+      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    });
   });
 });
 
-describe('Quad To', () => {
-  it('should return an integer 5 larger than the index passed in', () => {
-    let index = 5;
-    expect(quadTo([], index, [1, 2], [3, 4])).to.equal(index + 5);
-  });
-  it('should place the code for quadTo in the instruction array at the index\'s value', () => {
-    let index = 12;
-    let arr = [];
-    let control = [12, 44];
-    let point = [80, 35];
-    quadTo(arr, index, control, point);
-    expect(arr[index]).to.equal(instructionCodes.quadTo);
-  });
-  //TODO auto-generate these tests---->>>>
-  it('should place the first value of the control array into the instructions array at index + 1', () => {
-    let index = 12;
-    let arr = [];
-    let control = [12, 44];
-    let point = [80, 35];
-    quadTo(arr, index, control, point);
-    expect(arr[index + 1]).to.equal(control[0]);
-  });
-  it('should place the second value of the control array into the instructions array at index + 2', () => {
-    let index = 12;
-    let arr = [];
-    let control = [12, 44];
-    let point = [80, 35];
-    quadTo(arr, index, control, point);
-    expect(arr[index + 2]).to.equal(control[1]);
-  });
-  it('should place the first value of the point array into the instructions array at index + 3', () => {
-    let index = 12;
-    let arr = [];
-    let control = [12, 44];
-    let point = [80, 35];
-    quadTo(arr, index, control, point);
-    expect(arr[index + 3]).to.equal(point[0]);
-  });
-  it('should place the first value of the point array into the instructions array at index + 3', () => {
-    let index = 12;
-    let arr = [];
-    let control = [12, 44];
-    let point = [80, 35];
-    quadTo(arr, index, control, point);
-    expect(arr[index + 4]).to.equal(point[1]);
-  });
-});
+describe('path quadratic binding function', () => {
+  it('should work', () => {
+    const mockSequencer = buildMockSequencer();
+    const quad = bindSequencerToQuad(mockSequencer);
 
-describe('Bezier To', () => {
-  it('should return an integer 7 larger than the index passed in', () => {
-    let index = 5;
-    expect(bezierTo([], index, [1, 2], [3, 4], [5, 6])).to.equal(index + 7);
-  });
-  it('should place the code for bezierTo in the instruction array at the index\'s value', () => {
-    let index = 5;
-    let arr = [];
-    bezierTo(arr, index, [1, 2], [3, 4], [5, 6]);
-    expect(arr[index]).to.equal(instructionCodes.bezierTo);
-  });
+    quad([2, 4], [6, 7]);
 
-  let descriptionTemplate = _.template('should place the value at index ${index} of ${argName} at the correct index ' +
-    'in the instruction array');
-  _.forEach({controlA: 0, controlB: 1, point: 2}, (v, k) => {
-    _.forEach(_.range(2), (i) => {
-      it(descriptionTemplate({index: i, argName: k}), () => {
-        let index = 45;
-        let arr = [];
-        let values = {
-          controlA: [4, 5],
-          controlB: [12, 30],
-          point: [10, 22]
-        };
-        bezierTo(arr, index, values.controlA, values.controlB, values.point);
-        expect(arr[index + 1 + (v * 2) + i]).to.equal(values[k][i]);
-      });
-    })
+    [
+      instructionCodes.quad,
+      2 + 10,
+      4 + 20,
+      6 + 10,
+      7 + 20
+    ].forEach((value, index) => {
+      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    });
   })
+});
+
+
+describe('path bezier binding function', () => {
+  it('should work', () => {
+    const mockSequencer = buildMockSequencer();
+    const bezier = bindSequencerToBezier(mockSequencer);
+
+    bezier([1, 3], [2, 4], [5, 7]);
+
+    [
+      instructionCodes.bezier,
+      1 + 10,
+      3 + 20,
+      2 + 10,
+      4 + 20,
+      5 + 10,
+      7 + 20
+    ].forEach((value, index) => {
+      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    });
+  });
+});
+
+describe('path arc binding function', () => {
+  it('should work', () => {
+    const mockSequencer = buildMockSequencer();
+    const arc = bindSequencerToArc(mockSequencer);
+
+    arc([22, 31], 12, true);
+
+    [
+      instructionCodes.arc,
+      22 + 10,
+      31 + 20,
+      12,
+      1
+    ].forEach((value, index) => {
+      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    });
+  });
+});
+
+describe('muliple sequetial path functions', () => {
+  it('should work', () => {
+    const mockSequencer = buildMockSequencer();
+    const move = bindSequencerToMove(mockSequencer);
+    const line = bindSequencerToLine(mockSequencer);
+    const bezier = bindSequencerToBezier(mockSequencer);
+
+    move([5, 7]);
+    line([11, 9]);
+    bezier([20, 25], [20, 31], [40, 35]);
+
+    [
+      instructionCodes.move,
+      5 + 10,
+      7 + 20,
+      instructionCodes.line,
+      11 + 10,
+      9 + 20,
+      instructionCodes.bezier,
+      20 + 10,
+      25 + 20,
+      20 + 10,
+      31 + 20,
+      40 + 10,
+      35 + 20
+    ].forEach((value, index) => {
+      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    });
+  });
 });

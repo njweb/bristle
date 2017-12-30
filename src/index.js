@@ -1,5 +1,5 @@
 import buildContext from './context'
-import renderer from './renderer'
+import {canvasRenderer, svgRenderer} from './renderer'
 
 const bristle = (configuration) => {
   const bristleContext = buildContext(configuration);
@@ -9,16 +9,29 @@ const bristle = (configuration) => {
       return bristleContext.instructions;
     },
     render: (configuration, instructions) => {
-      const bristleRenderer = renderer(configuration);
+      const renderer = canvasRenderer(configuration);
       if (instructions) {
         if (process.env.NODE_ENV !== "production") {
           if (!Array.isArray(instructions)) {
             throw Error('Must provide instructions as an array');
           }
         }
-        return bristleRenderer(instructions);
+        return renderer(instructions);
       } else {
-        return bristleRenderer;
+        return renderer;
+      }
+    },
+    renderSVG: (configuration, instructions) => {
+      const renderer = svgRenderer(configuration);
+      if (instructions) {
+        if (process.env.NODE_ENV !== 'production') {
+          if (!Array.isArray(instructions)) {
+            throw Error('Must provide instructions as an array');
+          }
+          return renderer(instructions);
+        }
+      } else {
+        return renderer;
       }
     }
   }

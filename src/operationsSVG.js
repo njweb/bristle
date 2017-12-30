@@ -8,7 +8,7 @@ const cache = [
 export const move = function move(projection, pathContainer, instructions, index) {
   const point = projection(
     cache[0], instructions.slice(index + 1, index + 3));
-  pathContainer.value += `M ${point[0]} ${point[1]}`;
+  pathContainer.value += `M${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
   pathContainer.pathTip[1] = point[1];
@@ -19,7 +19,7 @@ export const move = function move(projection, pathContainer, instructions, index
 export const line = function line(projection, pathContainer, instructions, index) {
   const point = projection(
     cache[0], instructions.slice(index + 1, index + 3));
-  pathContainer.value += `L ${point[0]} ${point[1]}`;
+  pathContainer.value += `L${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
   pathContainer.pathTip[1] = point[1];
@@ -32,7 +32,7 @@ export const quad = function quad(projection, pathContainer, instructions, index
     cache[0], instructions.slice(index + 1, index + 3));
   const point = projection(
     cache[1], instructions.slice(index + 3, index + 5));
-  pathContainer.value += `Q ${control[0]} ${control[1]} ${point[0]} ${point[1]}`;
+  pathContainer.value += `Q${control[0]} ${control[1]} ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
   pathContainer.pathTip[1] = point[1];
@@ -47,7 +47,7 @@ export const bezier = function bezier(projection, pathContainer, instructions, i
     cache[1], instructions.slice(index + 3, index + 5));
   const point = projection(
     cache[2], instructions.slice(index + 5, index + 7));
-  pathContainer.value += `C ${controlA[0]} ${controlA[1]} ${controlB[0]} ${controlB[1]} ${point[0]} ${point[1]}`;
+  pathContainer.value += `C${controlA[0]} ${controlA[1]} ${controlB[0]} ${controlB[1]} ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
   pathContainer.pathTip[1] = point[1];
@@ -91,13 +91,15 @@ export const arc = function arc(projection, pathContainer, instructions, index) 
   const isLargeArc = _isLargeArcSweep(startAngle, endAngle, sweepFlag) ? 0 : 1;
 
   if(!_arePointsApproximatelyEqual(pathContainer.pathTip, startPoint)){
-    pathContainer.value += `L ${startPoint[0]} ${startPoint[1]}`;
+    pathContainer.value += `L${startPoint[0]} ${startPoint[1]}`;
   }
 
-  pathContainer.value += `A ${radius} ${radius} 0 ${isLargeArc} ${sweepFlag} ${endPoint[0]} ${endPoint[1]}`;
+  pathContainer.value += `A${radius} ${radius} 0 ${isLargeArc} ${sweepFlag} ${endPoint[0]} ${endPoint[1]}`;
 
   pathContainer.pathTip[0] = endPoint[0];
   pathContainer.pathTip[1] = endPoint[1];
 
   return index + 7;
 };
+
+export default {move, line, quad, bezier, arc}
