@@ -1,58 +1,49 @@
 import instructionCodes from './instructionCodes'
 import {applyTransform, applyScalarTransform} from "./transform";
-import {sequence} from "./sequence";
 
-export const bindSequencerToMove = sequencer => point => {
+export const moveInContext = sequencer => point => {
   const {instructions, transform, cache} = sequencer;
-  const index = instructions[0]  + 1;
   const transformedPoint = applyTransform(cache[0], transform, point);
 
-  instructions[index] = instructionCodes.move;
-
-  instructions[index + 1] = transformedPoint[0];
-  instructions[index + 2] = transformedPoint[1];
-
-  instructions[0] = index + 2;
+  const index = instructions[0];
+  instructions[index + 1] = instructionCodes.move;
+  instructions[index + 2] = transformedPoint[0];
+  instructions[index + 3] = transformedPoint[1];
+  instructions[0] = index + 3;
 
   return sequencer;
 };
 
-export const bindSequencerToLine = sequencer => point => {
+export const lineInContext = sequencer => point => {
   const {instructions, transform, cache} = sequencer;
-  const index = instructions[0] + 1;
   const transformedPoint = applyTransform(cache[0], transform, point);
 
-  instructions[index] = instructionCodes.line;
-
-  instructions[index + 1] = transformedPoint[0];
-  instructions[index + 2] = transformedPoint[1];
-
-  instructions[0] = index + 2;
+  let index = instructions[0];
+  instructions[index + 1] = instructionCodes.line;
+  instructions[index + 2] = transformedPoint[0];
+  instructions[index + 3] = transformedPoint[1];
+  instructions[0] = index + 3;
 
   return sequencer;
 };
 
-export const bindSequencerToQuad = sequencer => (control, point) => {
+export const quadInContext = sequencer => (control, point) => {
   const {instructions, transform, cache} = sequencer;
-  const index = instructions[0] + 1;
-
   const transformedControl = applyTransform(cache[0], transform, control);
   const transformedPoint = applyTransform(cache[1], transform, point);
 
-  instructions[index] = instructionCodes.quad;
-
-  instructions[index + 1] = transformedControl[0];
-  instructions[index + 2] = transformedControl[1];
-
-  instructions[index + 3] = transformedPoint[0];
-  instructions[index + 4] = transformedPoint[1];
-
-  instructions[0] = index + 4;
+  let index = instructions[0];
+  instructions[index + 1] = instructionCodes.quad;
+  instructions[index + 2] = transformedControl[0];
+  instructions[index + 3] = transformedControl[1];
+  instructions[index + 4] = transformedPoint[0];
+  instructions[index + 5] = transformedPoint[1];
+  instructions[0] = index + 5;
 
   return sequencer;
 };
 
-export const bindSequencerToBezier = sequencer => (controlA, controlB, point) => {
+export const bezierInContext = sequencer => (controlA, controlB, point) => {
   const {instructions, transform, cache} = sequencer;
   const index = instructions[0] + 1;
 
@@ -76,7 +67,7 @@ export const bindSequencerToBezier = sequencer => (controlA, controlB, point) =>
   return sequencer;
 };
 
-export const bindSequencerToArc = sequencer => (center, radius, startAngle, endAngle, isCCW) => {
+export const arcInContext = sequencer => (center, radius, startAngle, endAngle, isCCW) => {
   const {instructions, transform, cache} = sequencer;
   const index = instructions[0] + 1;
   const transformedCenter = applyTransform(cache[0], center, transform);

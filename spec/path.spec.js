@@ -1,11 +1,11 @@
 import {
-  bindSequencerToMove,
-  bindSequencerToLine,
-  bindSequencerToQuad,
-  bindSequencerToBezier,
-  bindSequencerToArc
-} from "../src2/pathInstructions"
-import instructionCodes from '../src2/instructionCodes'
+  moveInContext,
+  lineInContext,
+  quadInContext,
+  bezierInContext,
+  arcInContext
+} from "../src/pathInstructions"
+import instructionCodes from '../src/instructionCodes'
 
 const buildMockSequencer = () => ({
   instructions: new Array(10).fill(0),
@@ -20,7 +20,7 @@ const buildMockSequencer = () => ({
 describe('path move binding function', () => {
   it('should work', () => {
     const mockSequencer = buildMockSequencer();
-    const move = bindSequencerToMove(mockSequencer);
+    const move = moveInContext(mockSequencer);
 
     move([4, 6]);
 
@@ -37,7 +37,7 @@ describe('path move binding function', () => {
 describe('path line binding function', () => {
   it('should work', () => {
     const mockSequencer = buildMockSequencer();
-    const line = bindSequencerToLine(mockSequencer);
+    const line = lineInContext(mockSequencer);
 
     line([4, 6]);
 
@@ -54,7 +54,7 @@ describe('path line binding function', () => {
 describe('path quadratic binding function', () => {
   it('should work', () => {
     const mockSequencer = buildMockSequencer();
-    const quad = bindSequencerToQuad(mockSequencer);
+    const quad = quadInContext(mockSequencer);
 
     quad([2, 4], [6, 7]);
 
@@ -74,7 +74,7 @@ describe('path quadratic binding function', () => {
 describe('path bezier binding function', () => {
   it('should work', () => {
     const mockSequencer = buildMockSequencer();
-    const bezier = bindSequencerToBezier(mockSequencer);
+    const bezier = bezierInContext(mockSequencer);
 
     bezier([1, 3], [2, 4], [5, 7]);
 
@@ -95,15 +95,17 @@ describe('path bezier binding function', () => {
 describe('path arc binding function', () => {
   it('should work', () => {
     const mockSequencer = buildMockSequencer();
-    const arc = bindSequencerToArc(mockSequencer);
+    const arc = arcInContext(mockSequencer);
 
-    arc([22, 31], 12, true);
+    arc([22, 31], 12, Math.PI * 0.4, Math.PI * 0.8, true);
 
     [
       instructionCodes.arc,
       22 + 10,
       31 + 20,
       12,
+      Math.PI * 0.4,
+      Math.PI * 0.8,
       1
     ].forEach((value, index) => {
       expect(mockSequencer.instructions[index + 1]).toBe(value);
@@ -114,9 +116,9 @@ describe('path arc binding function', () => {
 describe('muliple sequetial path functions', () => {
   it('should work', () => {
     const mockSequencer = buildMockSequencer();
-    const move = bindSequencerToMove(mockSequencer);
-    const line = bindSequencerToLine(mockSequencer);
-    const bezier = bindSequencerToBezier(mockSequencer);
+    const move = moveInContext(mockSequencer);
+    const line = lineInContext(mockSequencer);
+    const bezier = bezierInContext(mockSequencer);
 
     move([5, 7]);
     line([11, 9]);

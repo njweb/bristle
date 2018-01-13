@@ -1,7 +1,7 @@
 import babel from 'rollup-plugin-babel'
 
 export default {
-  input: 'src2/index.js',
+  input: 'src/index.js',
   name: 'bristle',
   plugins: [
     babel({exclude: 'node_modules/**'})
