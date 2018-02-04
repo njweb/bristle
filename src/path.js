@@ -5,8 +5,13 @@ import {
   bezierInContext,
   arcInContext
 } from "./pathInstructions";
+import {applyScalarTransform} from "./transform";
+import {transformMat2d as applyTransform} from "./glMatrix/vec2";
+import { create as mat2dCreate} from "./glMatrix/mat2d";
 
-const branchInContext = context => (predicate, transform, state) => {
+const IDENTITY_TRANSFORM = mat2dCreate();
+
+const branch = context => (predicate, transform, state) => {
   const previousState = context.state;
   const previousTransform = context.transform;
 
@@ -25,11 +30,17 @@ const branchInContext = context => (predicate, transform, state) => {
   return context;
 };
 
+const action = context => predicate => {
+  predicate(context);
+  return context;
+};
+
 const path = (instructions) => {
   const cacheBuffer = new ArrayBuffer(24);
   const bristleContext = {
     instructions,
-    transform: [0, 0],
+    transform: IDENTITY_TRANSFORM,
+    pathTip: [0, 0],
     state: null,
     cache: [
       new Float32Array(cacheBuffer, 0, 2),
@@ -37,14 +48,18 @@ const path = (instructions) => {
       new Float32Array(cacheBuffer, 4 * 4, 2)
     ],
     branch: null,
+    action: null,
     move: null,
     line: null,
     quad: null,
     bezier: null,
-    arc: null
+    arc: null,
+    applyTransform,
+    applyScalarTransform
   };
 
-  bristleContext.branch = branchInContext(bristleContext);
+  bristleContext.branch = branch(bristleContext);
+  bristleContext.action = action(bristleContext);
   bristleContext.move = moveInContext(bristleContext);
   bristleContext.line = lineInContext(bristleContext);
   bristleContext.quad = quadInContext(bristleContext);

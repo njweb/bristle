@@ -1,14 +1,9 @@
-const pointCacheBuffer = new ArrayBuffer(24);
-const cache = [
-  new Float32Array(pointCacheBuffer, 0, 2),
-  new Float32Array(pointCacheBuffer, 4 * 2, 2),
-  new Float32Array(pointCacheBuffer, 4 * 4, 2)
-];
+import instructionCodes from "./instructionCodes";
 
-export const move = function move(projection, pathContainer, instructions, index) {
+export const moveOperation = (pathContainer, instructions, index, projection, cache) => {
   const point = projection(
     cache[0], instructions.slice(index + 1, index + 3));
-  pathContainer.value += `M ${point[0]} ${point[1]}`;
+  pathContainer.path += `M ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
   pathContainer.pathTip[1] = point[1];
@@ -16,10 +11,10 @@ export const move = function move(projection, pathContainer, instructions, index
   return index + 3;
 };
 
-export const line = function line(projection, pathContainer, instructions, index) {
+export const lineOperation = (pathContainer, instructions, index, projection, cache) => {
   const point = projection(
     cache[0], instructions.slice(index + 1, index + 3));
-  pathContainer.value += `L ${point[0]} ${point[1]}`;
+  pathContainer.path += `L ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
   pathContainer.pathTip[1] = point[1];
@@ -27,12 +22,12 @@ export const line = function line(projection, pathContainer, instructions, index
   return index + 3;
 };
 
-export const quad = function quad(projection, pathContainer, instructions, index) {
+export const quadOperation = (pathContainer, instructions, index, projection, cache) => {
   const control = projection(
     cache[0], instructions.slice(index + 1, index + 3));
   const point = projection(
     cache[1], instructions.slice(index + 3, index + 5));
-  pathContainer.value += `Q ${control[0]} ${control[1]} ${point[0]} ${point[1]}`;
+  pathContainer.path += `Q ${control[0]} ${control[1]} ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
   pathContainer.pathTip[1] = point[1];
@@ -40,14 +35,14 @@ export const quad = function quad(projection, pathContainer, instructions, index
   return index + 5;
 };
 
-export const bezier = function bezier(projection, pathContainer, instructions, index) {
+export const bezierOperation = (pathContainer, instructions, index, projection, cache) => {
   const controlA = projection(
     cache[0], instructions.slice(index + 1, index + 3));
   const controlB = projection(
     cache[1], instructions.slice(index + 3, index + 5));
   const point = projection(
     cache[2], instructions.slice(index + 5, index + 7));
-  pathContainer.value += `C ${controlA[0]} ${controlA[1]} ${controlB[0]} ${controlB[1]} ${point[0]} ${point[1]}`;
+  pathContainer.path += `C ${controlA[0]} ${controlA[1]} ${controlB[0]} ${controlB[1]} ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
   pathContainer.pathTip[1] = point[1];
@@ -55,13 +50,13 @@ export const bezier = function bezier(projection, pathContainer, instructions, i
   return index + 7;
 };
 
-export const _projectArcEdgePoint = function _projectArcEdgePoint(out, radius, angle, center, projection) {
+export const _projectArcEdgePoint = (out, radius, angle, center, projection) => {
   out[0] = (Math.cos(angle) * radius) + center[0];
   out[1] = (Math.sin(angle) * radius) + center[1];
   return out;
 };
 
-export const _isLargeArcSweep = function _isLargeArcSweep(startAngle, endAngle, sweepFlag) {
+export const _isLargeArcSweep = (startAngle, endAngle, sweepFlag) => {
   const twoPI = Math.PI * 2;
   startAngle = startAngle % twoPI;
   endAngle = endAngle % twoPI;
@@ -75,12 +70,12 @@ export const _isLargeArcSweep = function _isLargeArcSweep(startAngle, endAngle, 
   return Math.abs(startAngle - endAngle) > Math.PI;
 };
 
-export const _arePointsApproximatelyEqual = function _arePointsApproximatelyEqual(pointA, pointB) {
+export const _arePointsApproximatelyEqual = (pointA, pointB) => {
   const cutoff = 0.01;
   return Math.abs(pointA[0] - pointB[0]) < cutoff && Math.abs(pointA[1] - pointB[1]) < cutoff;
 };
 
-export const arc = function arc(projection, pathContainer, instructions, index) {
+export const arcOperation = (pathContainer, instructions, index, projection, cache) => {
   const point = projection(cache[0], instructions.slice(index + 1, index + 3));
   const radius = projection(cache[1], [instructions[index + 3], 0])[0];
   const startAngle = instructions[index + 4];
@@ -91,13 +86,51 @@ export const arc = function arc(projection, pathContainer, instructions, index) 
   const isLargeArc = _isLargeArcSweep(startAngle, endAngle, sweepFlag) ? 0 : 1;
 
   if(!_arePointsApproximatelyEqual(pathContainer.pathTip, startPoint)){
-    pathContainer.value += `L ${startPoint[0]} ${startPoint[1]}`;
+    pathContainer.path += `L ${startPoint[0]} ${startPoint[1]}`;
   }
 
-  pathContainer.value += `A ${radius} ${radius} 0 ${isLargeArc} ${sweepFlag} ${endPoint[0]} ${endPoint[1]}`;
+  pathContainer.path += `A ${radius} ${radius} 0 ${isLargeArc} ${sweepFlag} ${endPoint[0]} ${endPoint[1]}`;
 
   pathContainer.pathTip[0] = endPoint[0];
   pathContainer.pathTip[1] = endPoint[1];
 
   return index + 7;
+};
+
+const renderOperations = [];
+renderOperations[instructionCodes.move] = moveOperation;
+renderOperations[instructionCodes.line] = lineOperation;
+renderOperations[instructionCodes.quad] = quadOperation;
+renderOperations[instructionCodes.bezier] = bezierOperation;
+renderOperations[instructionCodes.arc] = arcOperation;
+
+const performRender = (projection, cache) => instructions => {
+  const pathContainer = {path: ''};
+  const endIndex = instructions[0];
+  let index = 1;
+  while(index < endIndex) {
+    index = renderOperations[instructions[index]](
+      pathContainer,
+      instructions,
+      index,
+      projection,
+      cache
+    );
+  }
+  return pathContainer.path;
+};
+
+export const renderToSvg = ({projection, instructions}) => {
+  const pointCacheBuffer = new ArrayBuffer(24);
+  const cache = [
+    new Float32Array(pointCacheBuffer, 0, 2),
+    new Float32Array(pointCacheBuffer, 4 * 2, 2),
+    new Float32Array(pointCacheBuffer, 4 * 4, 2)
+  ];
+
+  const renderer = performRender(projection, cache);
+  if(instructions) {
+    return renderer(instructions);
+  }
+  else return renderer;
 };

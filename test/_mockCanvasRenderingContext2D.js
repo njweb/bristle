@@ -28,4 +28,4 @@ let mock = () => {
   };
 };
 
-export {mock as canvasRenderingContext2DMock}
+export default mock;

@@ -1,9 +1,13 @@
 import instructionCodes from './instructionCodes'
-import {applyTransform, applyScalarTransform} from "./transform";
+import validatePoint from './validation/validatePoint'
 
-export const moveInContext = sequencer => point => {
-  const {instructions, transform, cache} = sequencer;
-  const transformedPoint = applyTransform(cache[0], transform, point);
+export const moveInContext = context => point => {
+  if(ENVIRONMENT === 'development') {
+      validatePoint(point);
+  }
+
+  const {instructions, transform, cache} = context;
+  const transformedPoint = context.applyTransform(cache[0], point, transform);
 
   const index = instructions[0];
   instructions[index + 1] = instructionCodes.move;
@@ -11,12 +15,19 @@ export const moveInContext = sequencer => point => {
   instructions[index + 3] = transformedPoint[1];
   instructions[0] = index + 3;
 
-  return sequencer;
+  context.pathTip[0] = transformedPoint[0];
+  context.pathTip[1] = transformedPoint[1];
+
+  return context;
 };
 
-export const lineInContext = sequencer => point => {
-  const {instructions, transform, cache} = sequencer;
-  const transformedPoint = applyTransform(cache[0], transform, point);
+export const lineInContext = context => point => {
+  if(ENVIRONMENT === 'development') {
+    validatePoint(point);
+  }
+
+  const {instructions, transform, cache} = context;
+  const transformedPoint = context.applyTransform(cache[0], point, transform);
 
   let index = instructions[0];
   instructions[index + 1] = instructionCodes.line;
@@ -24,13 +35,21 @@ export const lineInContext = sequencer => point => {
   instructions[index + 3] = transformedPoint[1];
   instructions[0] = index + 3;
 
-  return sequencer;
+  context.pathTip[0] = transformedPoint[0];
+  context.pathTip[1] = transformedPoint[1];
+
+  return context;
 };
 
-export const quadInContext = sequencer => (control, point) => {
-  const {instructions, transform, cache} = sequencer;
-  const transformedControl = applyTransform(cache[0], transform, control);
-  const transformedPoint = applyTransform(cache[1], transform, point);
+export const quadInContext = context => (control, point) => {
+  if(ENVIRONMENT === 'development') {
+    validatePoint(control, 'control');
+    validatePoint(point);
+  }
+
+  const {instructions, transform, cache} = context;
+  const transformedControl = context.applyTransform(cache[0], control, transform);
+  const transformedPoint = context.applyTransform(cache[1], point, transform);
 
   let index = instructions[0];
   instructions[index + 1] = instructionCodes.quad;
@@ -40,16 +59,25 @@ export const quadInContext = sequencer => (control, point) => {
   instructions[index + 5] = transformedPoint[1];
   instructions[0] = index + 5;
 
-  return sequencer;
+  context.pathTip[0] = transformedPoint[0];
+  context.pathTip[1] = transformedPoint[1];
+
+  return context;
 };
 
-export const bezierInContext = sequencer => (controlA, controlB, point) => {
-  const {instructions, transform, cache} = sequencer;
+export const bezierInContext = context => (controlA, controlB, point) => {
+  if(ENVIRONMENT === 'development') {
+    validatePoint(controlA, 'controlA');
+    validatePoint(controlB, 'controlB');
+    validatePoint(point);
+  }
+
+  const {instructions, transform, cache} = context;
   const index = instructions[0] + 1;
 
-  const transformedControlA = applyTransform(cache[0], controlA, transform);
-  const transformedControlB = applyTransform(cache[1], controlB, transform);
-  const transformedPoint = applyTransform(cache[2], point, transform);
+  const transformedControlA = context.applyTransform(cache[0], controlA, transform);
+  const transformedControlB = context.applyTransform(cache[1], controlB, transform);
+  const transformedPoint = context.applyTransform(cache[2], point, transform);
 
   instructions[index] = instructionCodes.bezier;
 
@@ -64,24 +92,39 @@ export const bezierInContext = sequencer => (controlA, controlB, point) => {
 
   instructions[0] = index + 6;
 
-  return sequencer;
+  context.pathTip[0] = transformedPoint[0];
+  context.pathTip[1] = transformedPoint[1];
+
+  return context;
 };
 
-export const arcInContext = sequencer => (center, radius, startAngle, endAngle, isCCW) => {
-  const {instructions, transform, cache} = sequencer;
+export const arcInContext = context => (center, radius, startAngle, endAngle, isCCW) => {
+  const {instructions, transform, cache} = context;
   const index = instructions[0] + 1;
-  const transformedCenter = applyTransform(cache[0], center, transform);
+  const transformedCenter = context.applyTransform(cache[0], center, transform);
+  const transformedRadius = context.applyScalarTransform(radius, transform);
 
   instructions[index] = instructionCodes.arc;
 
   instructions[index + 1] = transformedCenter[0];
   instructions[index + 2] = transformedCenter[1];
-  instructions[index + 3] = applyScalarTransform(radius, transform);
+  instructions[index + 3] = transformedRadius;
   instructions[index + 4] = startAngle;
   instructions[index + 5] = endAngle;
   instructions[index + 6] = isCCW ? 1 : 0;
 
   instructions[0] = index + 6;
 
-  return sequencer;
+  const transformedPoint = context.applyTransform(cache[1],
+      [
+        center[0] + (Math.cos(endAngle) * transformedRadius),
+        center[1] + (Math.sin(endAngle) * transformedRadius)
+      ],
+      transform
+    );
+
+  context.pathTip[0] = transformedPoint[0];
+  context.pathTip[1] = transformedPoint[1];
+
+  return context;
 };

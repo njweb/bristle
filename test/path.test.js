@@ -5,16 +5,24 @@ import {
   bezierInContext,
   arcInContext
 } from "../src/pathInstructions"
+import {applyScalarTransform} from '../src/transform'
 import instructionCodes from '../src/instructionCodes'
+import * as mat2d from '../src/glMatrix/mat2d'
+import {transformMat2d as applyTransform} from "../src/glMatrix/vec2";
+
+const transform = mat2d.fromTranslation(mat2d.create(), [10, 20]);
 
 const buildMockSequencer = () => ({
   instructions: new Array(10).fill(0),
-  transform: [10, 20],
+  transform,
   cache: [
     [0, 0],
     [0, 0],
     [0, 0]
-  ]
+  ],
+  pathTip: [0, 0],
+  applyTransform,
+  applyScalarTransform
 });
 
 describe('path move binding function', () => {

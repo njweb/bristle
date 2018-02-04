@@ -1,18 +1,18 @@
 import instructionCodes from './instructionCodes'
 
-const moveOperation = (canvasContext2D, instructions, index, projection,cache) => {
+const moveOperation = (canvasContext2D, instructions, index, projection, cache) => {
   const point = projection(cache[0], instructions.slice(index + 1, index + 3));
   canvasContext2D.moveTo(point[0], point[1]);
   return index + 3;
 };
 
-const lineOperation = (canvasContext2D, instructions, index, projection,cache) => {
+const lineOperation = (canvasContext2D, instructions, index, projection, cache) => {
   const point = projection(cache[0], instructions.slice(index + 1, index + 3));
   canvasContext2D.lineTo(point[0], point[1]);
   return index + 3;
 };
 
-const quadOperation = (canvasContext2D, instructions, index, projection,cache) => {
+const quadOperation = (canvasContext2D, instructions, index, projection, cache) => {
   const control = projection(
     cache[0], instructions.slice(index + 1, index + 3));
   const point = projection(
@@ -25,7 +25,7 @@ const quadOperation = (canvasContext2D, instructions, index, projection,cache) =
   return index + 5;
 };
 
-const bezierOperation = (canvasContext2D, instructions, index, projection,cache) => {
+const bezierOperation = (canvasContext2D, instructions, index, projection, cache) => {
   const controlA = projection(
     cache[0], instructions.slice(index + 1, index + 3));
   const controlB = projection(
@@ -42,7 +42,7 @@ const bezierOperation = (canvasContext2D, instructions, index, projection,cache)
   return index + 7;
 };
 
-const arcOperation = (canvasContext2D, instructions, index, projection,cache) => {
+const arcOperation = (canvasContext2D, instructions, index, projection, cache) => {
   const point = projection(cache[0], instructions.slice(index + 1, index + 3));
   const radius = projection(cache[1], [instructions[index + 3], 0])[0];
   const isCCW = instructions[index + 6] !== 0;
@@ -64,10 +64,10 @@ renderOperations[instructionCodes.quad] = quadOperation;
 renderOperations[instructionCodes.bezier] = bezierOperation;
 renderOperations[instructionCodes.arc] = arcOperation;
 
-const renderToCanvas = (canvasContext2D, projection, cache) => instructions => {
-  const limitIndex = instructions[0];
+const performRender = (canvasContext2D, projection, cache) => instructions => {
+  const endIndex = instructions[0];
   let index = 1;
-  while (index < limitIndex) {
+  while (index < endIndex) {
     index = renderOperations[instructions[index]](
       canvasContext2D,
       instructions,
@@ -76,10 +76,10 @@ const renderToCanvas = (canvasContext2D, projection, cache) => instructions => {
       cache
     );
   }
-  return canvasContext2D;
+  return instructions;
 };
 
-export const canvasRenderer = ({canvasContext2D, projection, instructions}) => {
+export const renderToCanvas = ({canvasContext2d, projection, instructions}) => {
   const pointCacheBuffer = new ArrayBuffer(24);
   const cache = [
     new Float32Array(pointCacheBuffer, 0, 2),
@@ -87,9 +87,10 @@ export const canvasRenderer = ({canvasContext2D, projection, instructions}) => {
     new Float32Array(pointCacheBuffer, 4 * 4, 2)
   ];
 
-  const renderer = renderToCanvas(canvasContext2D, projection, cache);
+  const renderer = performRender(canvasContext2d, projection, cache);
   if (instructions) {
-    return renderer(instructions);
+    renderer(instructions);
+    return renderer;
   }
   else return renderer;
 };
