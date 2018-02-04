@@ -1,8 +1,7 @@
 import instructionCodes from "./instructionCodes";
 
-export const moveOperation = (pathContainer, instructions, index, projection, cache) => {
-  const point = projection(
-    cache[0], instructions.slice(index + 1, index + 3));
+export const moveOperation = (pathContainer, instructions, index, cache) => {
+  const point = instructions.slice(index + 1, index + 3);
   pathContainer.path += `M ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
@@ -11,9 +10,8 @@ export const moveOperation = (pathContainer, instructions, index, projection, ca
   return index + 3;
 };
 
-export const lineOperation = (pathContainer, instructions, index, projection, cache) => {
-  const point = projection(
-    cache[0], instructions.slice(index + 1, index + 3));
+export const lineOperation = (pathContainer, instructions, index, cache) => {
+  const point = instructions.slice(index + 1, index + 3);
   pathContainer.path += `L ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
@@ -22,11 +20,9 @@ export const lineOperation = (pathContainer, instructions, index, projection, ca
   return index + 3;
 };
 
-export const quadOperation = (pathContainer, instructions, index, projection, cache) => {
-  const control = projection(
-    cache[0], instructions.slice(index + 1, index + 3));
-  const point = projection(
-    cache[1], instructions.slice(index + 3, index + 5));
+export const quadOperation = (pathContainer, instructions, index, cache) => {
+  const control = instructions.slice(index + 1, index + 3);
+  const point = instructions.slice(index + 3, index + 5)
   pathContainer.path += `Q ${control[0]} ${control[1]} ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
@@ -35,13 +31,10 @@ export const quadOperation = (pathContainer, instructions, index, projection, ca
   return index + 5;
 };
 
-export const bezierOperation = (pathContainer, instructions, index, projection, cache) => {
-  const controlA = projection(
-    cache[0], instructions.slice(index + 1, index + 3));
-  const controlB = projection(
-    cache[1], instructions.slice(index + 3, index + 5));
-  const point = projection(
-    cache[2], instructions.slice(index + 5, index + 7));
+export const bezierOperation = (pathContainer, instructions, index, cache) => {
+  const controlA = instructions.slice(index + 1, index + 3);
+  const controlB = instructions.slice(index + 3, index + 5);
+  const point = instructions.slice(index + 5, index + 7);
   pathContainer.path += `C ${controlA[0]} ${controlA[1]} ${controlB[0]} ${controlB[1]} ${point[0]} ${point[1]}`;
 
   pathContainer.pathTip[0] = point[0];
@@ -50,7 +43,7 @@ export const bezierOperation = (pathContainer, instructions, index, projection, 
   return index + 7;
 };
 
-export const _projectArcEdgePoint = (out, radius, angle, center, projection) => {
+export const _projectArcEdgePoint = (out, radius, angle, center) => {
   out[0] = (Math.cos(angle) * radius) + center[0];
   out[1] = (Math.sin(angle) * radius) + center[1];
   return out;
@@ -75,13 +68,13 @@ export const _arePointsApproximatelyEqual = (pointA, pointB) => {
   return Math.abs(pointA[0] - pointB[0]) < cutoff && Math.abs(pointA[1] - pointB[1]) < cutoff;
 };
 
-export const arcOperation = (pathContainer, instructions, index, projection, cache) => {
-  const point = projection(cache[0], instructions.slice(index + 1, index + 3));
-  const radius = projection(cache[1], [instructions[index + 3], 0])[0];
+export const arcOperation = (pathContainer, instructions, index, cache) => {
+  const point = instructions.slice(index + 1, index + 3);
+  const radius = instructions[index + 3];
   const startAngle = instructions[index + 4];
   const endAngle = instructions[index + 5];
-  const startPoint = _projectArcEdgePoint(cache[1], radius, startAngle, point, projection);
-  const endPoint = _projectArcEdgePoint(cache[1], radius, startAngle, point, projection);
+  const startPoint = _projectArcEdgePoint(cache[1], radius, startAngle, point);
+  const endPoint = _projectArcEdgePoint(cache[1], radius, startAngle, point);
   const sweepFlag = instructions[index + 6] !== 0 ? 0 : 1;
   const isLargeArc = _isLargeArcSweep(startAngle, endAngle, sweepFlag) ? 0 : 1;
 
@@ -104,7 +97,7 @@ renderOperations[instructionCodes.quad] = quadOperation;
 renderOperations[instructionCodes.bezier] = bezierOperation;
 renderOperations[instructionCodes.arc] = arcOperation;
 
-const performRender = (projection, cache) => instructions => {
+const performRender = cache => instructions => {
   const pathContainer = {path: ''};
   const endIndex = instructions[0];
   let index = 1;
@@ -113,14 +106,13 @@ const performRender = (projection, cache) => instructions => {
       pathContainer,
       instructions,
       index,
-      projection,
       cache
     );
   }
   return pathContainer.path;
 };
 
-export const renderToSvg = ({projection, instructions}) => {
+export const renderToSvg = ({ instructions }) => {
   const pointCacheBuffer = new ArrayBuffer(24);
   const cache = [
     new Float32Array(pointCacheBuffer, 0, 2),
@@ -128,7 +120,7 @@ export const renderToSvg = ({projection, instructions}) => {
     new Float32Array(pointCacheBuffer, 4 * 4, 2)
   ];
 
-  const renderer = performRender(projection, cache);
+  const renderer = performRender(cache);
   if(instructions) {
     return renderer(instructions);
   }
