@@ -1,11 +1,11 @@
-import path from './path'
+import {createPath} from './path'
 import {renderToCanvas} from './renderToCanvas'
 import {renderToSvg} from './renderToSvg'
 
-export { path, renderToCanvas, renderToSvg };
+export { createPath, renderToCanvas, renderToSvg };
 
 export default {
-  path,
+  createPath,
   renderToCanvas,
   renderToSvg
 };

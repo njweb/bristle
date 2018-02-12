@@ -1,4 +1,7 @@
-let mock = () => {
+import bristle from "../src/bristle";
+import instructionCodes from "../src/instructionCodes";
+
+let mockCanvasRenderingContext2d = () => {
   return {
     canvas: {width: 100, height: 50},
 
@@ -28,4 +31,31 @@ let mock = () => {
   };
 };
 
-export default mock;
+describe('bristle render', () => {
+  it('should sorta work', () => {
+    const instructions = [].concat(
+      18,
+      instructionCodes.move,
+      [2, 4],
+      instructionCodes.line,
+      [4, -10],
+      instructionCodes.quad,
+      [10, -10],
+      [14, 0],
+      instructionCodes.bezier,
+      [14, -10],
+      [10, -8],
+      [2, -2]
+    );
+
+    const mockCanvasContext = mockCanvasRenderingContext2d();
+
+    bristle.renderToCanvas(
+      {
+        canvasContext2d: mockCanvasContext,
+        instructions
+      });
+
+    expect(JSON.stringify(mockCanvasContext.storage)).toMatchSnapshot();
+  });
+});

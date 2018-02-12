@@ -1,153 +1,64 @@
+import bristle from '../src/bristle'
 import {
-  moveInContext,
-  lineInContext,
-  quadInContext,
-  bezierInContext,
-  arcInContext
-} from "../src/pathInstructions"
-import {applyScalarTransform} from '../src/transform'
-import instructionCodes from '../src/instructionCodes'
-import * as mat2d from '../src/glMatrix/mat2d'
-import {transformMat2d as applyTransform} from "../src/glMatrix/vec2";
+  fromTranslation as mat2dFromTranslation,
+  multiply as mat2dMultiply
+} from "../src/glMatrix/mat2d";
 
-const transform = mat2d.fromTranslation(mat2d.create(), [10, 20]);
+describe('bristle paths', () => {
+  it('should handle muliple sequetial path functions correctly', () => {
+    const testPath = bristle.createPath([]);
 
-const buildMockSequencer = () => ({
-  instructions: new Array(10).fill(0),
-  transform,
-  cache: [
-    [0, 0],
-    [0, 0],
-    [0, 0]
-  ],
-  pathTip: [0, 0],
-  applyTransform,
-  applyScalarTransform
-});
-
-describe('path move binding function', () => {
-  it('should work', () => {
-    const mockSequencer = buildMockSequencer();
-    const move = moveInContext(mockSequencer);
-
-    move([4, 6]);
-
-    [
-      instructionCodes.move,
-      4 + 10,
-      6 + 20
-    ].forEach((value, index) => {
-      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    const predicate = (ctx => {
+      ctx
+        .move([12, 13])
+        .line([14, 13])
+        .quad([16, 13], [16, 16])
+        .bezier([18, 16], [22, 16], [22, 20])
+        .move([28, 20])
+        .line([28, 18])
+        .quad([28, 16], [30, 16])
+        .bezier([30, 12], [22, 10], [24, 10]);
     });
+
+    const testInstructions = testPath(predicate);
+
+    expect(testInstructions).toMatchSnapshot();
   });
-});
 
-describe('path line binding function', () => {
-  it('should work', () => {
-    const mockSequencer = buildMockSequencer();
-    const line = lineInContext(mockSequencer);
+  it('should handle branching paths correctly', () => {
+    const testPath = bristle.createPath([]);
 
-    line([4, 6]);
-
-    [
-      instructionCodes.line,
-      4 + 10,
-      6 + 20
-    ].forEach((value, index) => {
-      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    const predicateC = (ctx => {
+      ctx
+        .line([-4, 0])
+        .line([4, 0]);
     });
-  });
-});
-
-describe('path quadratic binding function', () => {
-  it('should work', () => {
-    const mockSequencer = buildMockSequencer();
-    const quad = quadInContext(mockSequencer);
-
-    quad([2, 4], [6, 7]);
-
-    [
-      instructionCodes.quad,
-      2 + 10,
-      4 + 20,
-      6 + 10,
-      7 + 20
-    ].forEach((value, index) => {
-      expect(mockSequencer.instructions[index + 1]).toBe(value);
+    const predicateB = (ctx => {
+      ctx
+        .line([-8, 0])
+        .line([-4, 0])
+        .branch(predicateC, mat2dMultiply(
+          [],
+          ctx.transform,
+          mat2dFromTranslation([], [0, 10])))
+        .line([0, 4])
+        .line([0, 8]);
     });
+    const predicateA = (ctx => {
+      ctx
+        .move([-16, 0])
+        .line([-8, 0])
+        .branch(predicateB, mat2dMultiply(
+          [],
+          ctx.transform,
+          mat2dFromTranslation([], [0, 10])
+        ))
+        .line([8, 0])
+        .line([16, 0]);
+    });
+
+    const testInstructions = testPath(predicateA);
+
+    expect(testInstructions).toMatchSnapshot();
   })
-});
-
-
-describe('path bezier binding function', () => {
-  it('should work', () => {
-    const mockSequencer = buildMockSequencer();
-    const bezier = bezierInContext(mockSequencer);
-
-    bezier([1, 3], [2, 4], [5, 7]);
-
-    [
-      instructionCodes.bezier,
-      1 + 10,
-      3 + 20,
-      2 + 10,
-      4 + 20,
-      5 + 10,
-      7 + 20
-    ].forEach((value, index) => {
-      expect(mockSequencer.instructions[index + 1]).toBe(value);
-    });
-  });
-});
-
-describe('path arc binding function', () => {
-  it('should work', () => {
-    const mockSequencer = buildMockSequencer();
-    const arc = arcInContext(mockSequencer);
-
-    arc([22, 31], 12, Math.PI * 0.4, Math.PI * 0.8, true);
-
-    [
-      instructionCodes.arc,
-      22 + 10,
-      31 + 20,
-      12,
-      Math.PI * 0.4,
-      Math.PI * 0.8,
-      1
-    ].forEach((value, index) => {
-      expect(mockSequencer.instructions[index + 1]).toBe(value);
-    });
-  });
-});
-
-describe('muliple sequetial path functions', () => {
-  it('should work', () => {
-    const mockSequencer = buildMockSequencer();
-    const move = moveInContext(mockSequencer);
-    const line = lineInContext(mockSequencer);
-    const bezier = bezierInContext(mockSequencer);
-
-    move([5, 7]);
-    line([11, 9]);
-    bezier([20, 25], [20, 31], [40, 35]);
-
-    [
-      instructionCodes.move,
-      5 + 10,
-      7 + 20,
-      instructionCodes.line,
-      11 + 10,
-      9 + 20,
-      instructionCodes.bezier,
-      20 + 10,
-      25 + 20,
-      20 + 10,
-      31 + 20,
-      40 + 10,
-      35 + 20
-    ].forEach((value, index) => {
-      expect(mockSequencer.instructions[index + 1]).toBe(value);
-    });
-  });
 });

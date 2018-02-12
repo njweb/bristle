@@ -7,11 +7,11 @@ import {
 } from "./pathInstructions";
 import {applyScalarTransform} from "./transform";
 import {transformMat2d as applyTransform} from "./glMatrix/vec2";
-import { create as mat2dCreate} from "./glMatrix/mat2d";
+import { create as mat2dCreate, multiply as mat2dMultiply} from "./glMatrix/mat2d";
 
 const IDENTITY_TRANSFORM = mat2dCreate();
 
-const branch = context => (predicate, transform, state) => {
+const branchInContext = context => (predicate, transform, state) => {
   const previousState = context.state;
   const previousTransform = context.transform;
 
@@ -30,12 +30,12 @@ const branch = context => (predicate, transform, state) => {
   return context;
 };
 
-const action = context => predicate => {
+const actionInContext = context => predicate => {
   predicate(context);
   return context;
 };
 
-const path = (instructions) => {
+export const createPath = (instructions) => {
   const cacheBuffer = new ArrayBuffer(24);
   const bristleContext = {
     instructions,
@@ -58,8 +58,8 @@ const path = (instructions) => {
     applyScalarTransform
   };
 
-  bristleContext.branch = branch(bristleContext);
-  bristleContext.action = action(bristleContext);
+  bristleContext.branch = branchInContext(bristleContext);
+  bristleContext.action = actionInContext(bristleContext);
   bristleContext.move = moveInContext(bristleContext);
   bristleContext.line = lineInContext(bristleContext);
   bristleContext.quad = quadInContext(bristleContext);
@@ -68,13 +68,11 @@ const path = (instructions) => {
 
   return (predicate, transform, state) => {
     bristleContext.instructions[0] = 0;
-    if(transform) bristleContext.transform = transform;
-    if(state) bristleContext.state = state;
 
+    bristleContext.transform = transform ? transform : IDENTITY_TRANSFORM;
+    bristleContext.state = state ? state : null;
     predicate(bristleContext);
 
     return bristleContext.instructions;
   }
 };
-
-export default path;

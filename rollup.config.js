@@ -5,21 +5,21 @@ import {minify} from 'uglify-es';
 
 const prodConfig = {
   inputFile: 'src/bristleUmd.js',
-  environmentReplacement: JSON.stringify('production'),
+  nodeEnvReplacement: JSON.stringify('production'),
   extraPlugins: [uglify({}, minify)],
   format: 'umd',
   outFilename: 'bristle.min.js'
 };
 const moduleConfig = {
   inputFile: 'src/bristle.js',
-  environmentReplacement: 'process.env.NODE_ENV',
+  nodeEnvReplacement: 'process.env.NODE_ENV',
   extraPlugins: [],
   format: 'es',
   outFilename: 'bristle.module.js'
 };
 const devConfig = {
   inputFile: 'src/bristleUmd.js',
-  environmentReplacement: 'process.env.NODE_ENV',
+  nodeEnvReplacement: 'process.env.NODE_ENV',
   extraPlugins: [],
   format: 'umd',
   outFilename: 'bristle.js'
@@ -40,7 +40,7 @@ export default {
   name: 'bristle',
   plugins: [
     replace({
-      ENVIRONMENT: configuration.environmentReplacement,
+      'process.env.NODE_ENV': configuration.nodeEnvReplacement,
     }),
     babel({exclude: 'node_modules/**'})
   ].concat(configuration.extraPlugins),

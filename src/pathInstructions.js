@@ -1,9 +1,9 @@
 import instructionCodes from './instructionCodes'
-import validatePoint from './validation/validatePoint'
+import { validatePoint } from "./validation";
 
 export const moveInContext = context => point => {
-  if(ENVIRONMENT === 'development') {
-      validatePoint(point);
+  if(process.env.NODE_ENV === 'development') {
+    validatePoint(point);
   }
 
   const {instructions, transform, cache} = context;
@@ -22,7 +22,7 @@ export const moveInContext = context => point => {
 };
 
 export const lineInContext = context => point => {
-  if(ENVIRONMENT === 'development') {
+  if(process.env.NODE_ENV === 'development') {
     validatePoint(point);
   }
 
@@ -42,7 +42,7 @@ export const lineInContext = context => point => {
 };
 
 export const quadInContext = context => (control, point) => {
-  if(ENVIRONMENT === 'development') {
+  if(process.env.NODE_ENV === 'development') {
     validatePoint(control, 'control');
     validatePoint(point);
   }
@@ -66,7 +66,7 @@ export const quadInContext = context => (control, point) => {
 };
 
 export const bezierInContext = context => (controlA, controlB, point) => {
-  if(ENVIRONMENT === 'development') {
+  if(process.env.NODE_ENV === 'development') {
     validatePoint(controlA, 'controlA');
     validatePoint(controlB, 'controlB');
     validatePoint(point);
