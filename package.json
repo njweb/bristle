@@ -14,11 +14,12 @@
     }
   ],
   "main": "lib/bristle.js",
-  "module": "lib/bristle.module.js",
+  "module": "lib/bristle.esm.js",
   "scripts": {
-    "build": "npm run clean && npm run build:dev && npm run build:module && npm run build:prod",
+    "build": "npm run clean && npm run build:dev && npm run build:module && npm run build:module-min && npm run build:prod",
     "build:dev": "rollup -c",
     "build:module": "(export NODE_ENV=module; rollup -c)",
+    "build:module-min": "(export NODE_ENV=module-min; rollup -c)",
     "build:prod": "(export NODE_ENV=production; rollup -c)",
     "clean": "rm -rf lib && mkdir -p lib/",
     "test": "jest test/*.test.js"

@@ -3,7 +3,7 @@ import replace from 'rollup-plugin-replace';
 import uglify from 'rollup-plugin-uglify';
 import {minify} from 'uglify-es';
 
-const prodConfig = {
+const minConfig = {
   inputFile: 'src/bristleUmd.js',
   nodeEnvReplacement: JSON.stringify('production'),
   extraPlugins: [uglify({}, minify)],
@@ -15,7 +15,14 @@ const moduleConfig = {
   nodeEnvReplacement: 'process.env.NODE_ENV',
   extraPlugins: [],
   format: 'es',
-  outFilename: 'bristle.module.js'
+  outFilename: 'bristle.esm.js'
+};
+const moduleMinConfig = {
+  inputFile: 'src/bristle.js',
+  nodeEnvReplacement: JSON.stringify('production'),
+  extraPlugins: [uglify({}, minify)],
+  format: 'es',
+  outFilename: 'bristle.esm.min.js'
 };
 const devConfig = {
   inputFile: 'src/bristleUmd.js',
@@ -27,9 +34,11 @@ const devConfig = {
 
 const configuration = (() => {
   if (process.env.NODE_ENV === 'production') {
-    return prodConfig;
+    return minConfig;
   } else if (process.env.NODE_ENV === 'module') {
     return moduleConfig;
+  } else if (process.env.NODE_ENV === 'module-min') {
+    return moduleMinConfig;
   } else {
     return devConfig;
   }
