@@ -15,7 +15,7 @@ const branchInContext = context => (predicate, transform, state) => {
   const previousTransform = context.transform;
 
   if(transform) {
-    context.transform = transform;
+    context.transform = mat2dMultiply(transform, context.transform, transform);
   }
   if(state) {
     context.state = state;
