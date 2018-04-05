@@ -97,34 +97,3 @@ export const bezierInContext = context => (controlA, controlB, point) => {
 
   return context;
 };
-
-export const arcInContext = context => (center, radius, startAngle, endAngle, isCCW) => {
-  const {instructions, transform, cache} = context;
-  const index = instructions[0] + 1;
-  const transformedCenter = context.applyTransform(cache[0], center, transform);
-  const transformedRadius = context.applyScalarTransform(radius, transform);
-
-  instructions[index] = instructionCodes.arc;
-
-  instructions[index + 1] = transformedCenter[0];
-  instructions[index + 2] = transformedCenter[1];
-  instructions[index + 3] = transformedRadius;
-  instructions[index + 4] = startAngle;
-  instructions[index + 5] = endAngle;
-  instructions[index + 6] = isCCW ? 1 : 0;
-
-  instructions[0] = index + 6;
-
-  const transformedPoint = context.applyTransform(cache[1],
-      [
-        center[0] + (Math.cos(endAngle) * transformedRadius),
-        center[1] + (Math.sin(endAngle) * transformedRadius)
-      ],
-      transform
-    );
-
-  context.pathTip[0] = transformedPoint[0];
-  context.pathTip[1] = transformedPoint[1];
-
-  return context;
-};

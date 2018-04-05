@@ -2,8 +2,7 @@ import {
   moveInContext,
   lineInContext,
   quadInContext,
-  bezierInContext,
-  arcInContext
+  bezierInContext
 } from "./pathInstructions";
 import {applyScalarTransform} from "./transform";
 import {transformMat2d as applyTransform} from "./glMatrix/vec2";
@@ -64,7 +63,6 @@ export const createPath = (instructions) => {
   bristleContext.line = lineInContext(bristleContext);
   bristleContext.quad = quadInContext(bristleContext);
   bristleContext.bezier = bezierInContext(bristleContext);
-  bristleContext.arc = arcInContext(bristleContext);
 
   return (predicate, transform, state) => {
     bristleContext.instructions[0] = 0;

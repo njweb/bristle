@@ -2,8 +2,7 @@ import {
   moveInContext,
   lineInContext,
   quadInContext,
-  bezierInContext,
-  arcInContext
+  bezierInContext
 } from "../src/pathInstructions"
 import {applyScalarTransform} from '../src/transform'
 import instructionCodes from '../src/instructionCodes'

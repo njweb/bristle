@@ -37,27 +37,11 @@ const bezierOperation = (canvasContext2D, instructions, index, cache) => {
   return index + 7;
 };
 
-const arcOperation = (canvasContext2D, instructions, index, cache) => {
-  const point = instructions.slice(index + 1, index + 3);
-  const radius = instructions[index + 3];
-  const isCCW = instructions[index + 6] !== 0;
-  canvasContext2D.arc(
-    point[0],
-    point[1],
-    radius,
-    instructions[index + 4],
-    instructions[index + 5],
-    isCCW
-  );
-  return index + 7;
-};
-
 const renderOperations = [];
 renderOperations[instructionCodes.move] = moveOperation;
 renderOperations[instructionCodes.line] = lineOperation;
 renderOperations[instructionCodes.quad] = quadOperation;
 renderOperations[instructionCodes.bezier] = bezierOperation;
-renderOperations[instructionCodes.arc] = arcOperation;
 
 const performRender = (canvasContext2D, cache) => instructions => {
   const endIndex = instructions[0];
