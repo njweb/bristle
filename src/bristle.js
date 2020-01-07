@@ -15,80 +15,91 @@ const vA = createVec2();
 const vB = createVec2();
 const vC = createVec2();
 
-const canvasCommands = {
-  moveTo: (ctx2d, p) => ctx2d.moveTo(p[0], p[1]),
-  lineTo: (ctx2d, p) => ctx2d.lineTo(p[0], p[1]),
-  quadTo: (ctx2d, c, p) => ctx2d.quadraticCurveTo(c[0], c[1], p[0], p[1]),
-  bezierTo: (ctx2d, c1, c2, p) => ctx2d.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], p[0], p[1]),
-}
+const buildCanvasCommands = ctx2d => ({
+  moveTo: p => ctx2d.moveTo(p[0], p[1]),
+  lineTo: p => ctx2d.lineTo(p[0], p[1]),
+  quadTo: (c, p) => ctx2d.quadraticCurveTo(c[0], c[1], p[0], p[1]),
+  bezierTo: (c1, c2, p) => ctx2d.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], p[0], p[1]),
+});
 
-const bristle = ({ ctx2d, pathState }) => {
-  const seqState = {
+const buildStringCommands = bristleState => ({
+  moveTo: p => bristleState.stringPath += `M${p[0]},${p[1]}`,
+  lineTo: p => bristleState.stringPath += `L${p[0]},${p[1]}`,
+  quadTo: (c, p) => bristleState.stringPath += `Q${c[0]},${c[1]},${p[0]},${p[1]}`,
+  bezierTo: (c1, c2, p) => bristleState.stringPath += `C${c1[0]},${c1[1]},${c2[0]},${c2[1]},${p[0]},${p[1]}`,
+});
+
+const bristle = ({ ctx2d, pathState, outputToString = false}) => {
+  const bristleState = {
     branchDepth: 0,
     transformStack: [createMat2d()],
 
     controlCount: 0,
     controlPoints: [createVec2(), createVec2],
   };
+  if (outputToString) {
+    bristleState.pathString = '';
+  };
+  const commands = outputToString ?
+    buildStringCommands(bristleState) :
+    buildCanvasCommands(ctx2d);
 
-  const getActiveTransform = () => seqState.transformStack[seqState.branchDepth];
+  const getActiveTransform = () => bristleState.transformStack[bristleState.branchDepth];
   const pushTransform = nextTransform => {
     const t = getActiveTransform();
-    const { branchDepth, transformStack } = seqState;
+    const { branchDepth, transformStack } = bristleState;
     if (transformStack.length <= branchDepth + 1) {
       transformStack.push(multiplyMat2d(createMat2d(), nextTransform, t));
     } else {
       multiplyMat2d(transformStack[branchDepth + 1], nextTransform, t);
     }
-    seqState.branchDepth += 1;
+    bristleState.branchDepth += 1;
   };
-  const popTransform = () => seqState.branchDepth = Math.max(0, seqState.branchDepth - 1);
+  const popTransform = () => bristleState.branchDepth = Math.max(0, bristleState.branchDepth - 1);
 
   const pathActions = [
-    // line
     point => {
-      canvasCommands.lineTo(ctx2d,
-        transformMat2d(vA, point, getActiveTransform()));
+      // line
+      commands.lineTo(transformMat2d(vA, point, getActiveTransform()));
     },
-    // quad
     point => {
+      // quad
       const t = getActiveTransform();
 
-      canvasCommands.quadTo(ctx2d,
-        transformMat2d(vA, seqState.controlPoints[0], t),
+      commands.quadTo(
+        transformMat2d(vA, bristleState.controlPoints[0], t),
         transformMat2d(vB, point, t));
 
-      seqState.controlCount = 0;
+      bristleState.controlCount = 0;
     },
-    // bezier
     point => {
+      // bezier
       const t = getActiveTransform();
 
-      canvasCommands.bezierTo(ctx2d,
-        transformMat2d(vA, seqState.controlPoints[0], t),
-        transformMat2d(vB, seqState.controlPoints[1], t),
+      commands.bezierTo(
+        transformMat2d(vA, bristleState.controlPoints[0], t),
+        transformMat2d(vB, bristleState.controlPoints[1], t),
         transformMat2d(vC, point, t));
 
-      seqState.controlCount = 0;
+      bristleState.controlCount = 0;
     }
   ];
 
   let pathContext;
   const methods = {
     moveTo: function(point) {
-      canvasCommands.moveTo(ctx2d,
-        transformMat2d(vA, point, getActiveTransform()));
+      commands.moveTo(transformMat2d(vA, point, getActiveTransform()));
       return pathContext;
     },
     pathTo: function(point) {
-      pathActions[seqState.controlCount](point);
+      pathActions[bristleState.controlCount](point);
       return pathContext
     },
     controlAt: function(point) {
-      if (seqState.controlCount > 1) throw Error('Attempt to assign too many control points');
+      if (bristleState.controlCount > 1) throw Error('Attempt to assign too many control points');
 
-      copyVec2(seqState.controlPoints[seqState.controlCount], point);
-      seqState.controlCount += 1;
+      copyVec2(bristleState.controlPoints[bristleState.controlCount], point);
+      bristleState.controlCount += 1;
       return pathContext
     },
     localToGlobal: function(out, point) {
@@ -116,7 +127,12 @@ const bristle = ({ ctx2d, pathState }) => {
 
   pathContext = Object.assign(Object.create(methods), { ctx2d });
 
-  return methods.branch;
+  return outputToString ?
+    (sequenceFn, transform) => {
+      bristleState.pathString = '';
+      pathContext.branch(sequenceFn, transform);
+      return bristleState.pathString;
+    } : pathContext.branch;
 };
 
 export default bristle;
