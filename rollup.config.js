@@ -1,60 +1,32 @@
-import babel from 'rollup-plugin-babel'
+import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
-import uglify from 'rollup-plugin-uglify';
-import {minify} from 'uglify-es';
+import {terser} from 'rollup-plugin-terser';
 
-const minConfig = {
-  inputFile: 'src/bristleUmd.js',
-  nodeEnvReplacement: JSON.stringify('production'),
-  extraPlugins: [uglify({}, minify)],
-  format: 'umd',
-  outFilename: 'bristle.min.js'
-};
-const moduleConfig = {
-  inputFile: 'src/bristle.js',
-  nodeEnvReplacement: 'process.env.NODE_ENV',
-  extraPlugins: [],
-  format: 'es',
-  outFilename: 'bristle.esm.js'
-};
-const moduleMinConfig = {
-  inputFile: 'src/bristle.js',
-  nodeEnvReplacement: JSON.stringify('production'),
-  extraPlugins: [uglify({}, minify)],
-  format: 'es',
-  outFilename: 'bristle.esm.min.js'
-};
-const devConfig = {
-  inputFile: 'src/bristleUmd.js',
-  nodeEnvReplacement: 'process.env.NODE_ENV',
-  extraPlugins: [],
-  format: 'umd',
-  outFilename: 'bristle.js'
-};
+const commonPlugins = [
+  replace({
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+  }),
+  babel({exclude: 'node_modules/**'})
+];
 
-const configuration = (() => {
-  if (process.env.NODE_ENV === 'production') {
-    return minConfig;
-  } else if (process.env.NODE_ENV === 'module') {
-    return moduleConfig;
-  } else if (process.env.NODE_ENV === 'module-min') {
-    return moduleMinConfig;
-  } else {
-    return devConfig;
-  }
-})();
+const rollupConfig = [
+  {
+    input: 'src/bristle.js',
+    plugins: commonPlugins,
+    output: {
+      format: 'esm',
+      file: 'lib/bristle.js',
+    },
+  },
+  {
+    input: 'src/bristleUmd.js',
+    plugins: [...commonPlugins, terser()],
+    output: {
+      format: 'umd',
+      name: 'bristle',
+      file: 'lib/bristle.min.js',
+    },
+  },
+];
 
-export default {
-  input: configuration.inputFile,
-  name: 'bristle',
-  plugins: [
-    replace({
-      'process.env.NODE_ENV': configuration.nodeEnvReplacement,
-    }),
-    babel({exclude: 'node_modules/**'})
-  ].concat(configuration.extraPlugins),
-  output: {
-    file: `lib/${configuration.outFilename}`,
-    format: configuration.format
-  }
-}
+export default rollupConfig;
