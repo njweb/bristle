@@ -10,6 +10,9 @@ import {
   transformMat2d,
 } from 'gl-matrix/esm/vec2';
 
+const ERR_MSG_NO_OUTPUT_TARGET = 'Must provide a canvas 2d context or activate output to string';
+const ERR_MSG_TOO_MANY_CONTROL_POINTS = 'Attempt to assign too many control points';
+
 const mA = createMat2d();
 const vA = createVec2();
 const vB = createVec2();
@@ -30,6 +33,8 @@ const buildStringCommands = bristleState => ({
 });
 
 const bristle = ({ ctx2d, pathState, outputToString = false}) => {
+  if(!ctx2d && !outputToString) throw Error(ERR_MSG_NO_OUTPUT_TARGET);
+
   const bristleState = {
     branchDepth: 0,
     transformStack: [createMat2d()],
@@ -96,7 +101,7 @@ const bristle = ({ ctx2d, pathState, outputToString = false}) => {
       return pathContext
     },
     controlAt: function(point) {
-      if (bristleState.controlCount > 1) throw Error('Attempt to assign too many control points');
+      if (bristleState.controlCount > 1) throw Error(ERR_MSG_TOO_MANY_CONTROL_POINTS);
 
       copyVec2(bristleState.controlPoints[bristleState.controlCount], point);
       bristleState.controlCount += 1;
