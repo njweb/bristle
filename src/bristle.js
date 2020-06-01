@@ -26,10 +26,10 @@ const buildCanvasCommands = ctx2d => ({
 });
 
 const buildStringCommands = bristleState => ({
-  moveTo: p => bristleState.pathString += `M${p[0]} ${p[1]}`
-  lineTo: p => bristleState.pathString += `L${p[0]} ${p[1]}`
-  quadTo: (c  p) => bristleState.pathString += `Q${c[0]} ${c[1]} ${p[0]} ${p[1]}`
-  bezierTo: (c1  c2  p) => bristleState.pathString += `C${c1[0]} ${c1[1]} ${c2[0]} ${c2[1]} ${p[0]} ${p[1]}`
+  moveTo: p => bristleState.pathString += `M${p[0]} ${p[1]}`,
+  lineTo: p => bristleState.pathString += `L${p[0]} ${p[1]}`,
+  quadTo: (c, p) => bristleState.pathString += `Q${c[0]} ${c[1]} ${p[0]} ${p[1]}`,
+  bezierTo: (c1, c2, p) => bristleState.pathString += `C${c1[0]} ${c1[1]} ${c2[0]} ${c2[1]} ${p[0]} ${p[1]}`,
 });
 
 const bristle = ({ ctx2d, pathState, outputToString = false}) => {
