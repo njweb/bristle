@@ -102,7 +102,7 @@ const bristle = ({ ctx2d, pathState, outputToString = false}) => {
       pathActions[bristleState.controlCount](point);
       return pathContext
     },
-    controlAt: function(point) {
+    setControl: function(point) {
       if (bristleState.controlCount > 1) throw Error(ERR_MSG_TOO_MANY_CONTROL_POINTS);
 
       copyVec2(bristleState.controlPoints[bristleState.controlCount], point);
@@ -127,9 +127,10 @@ const bristle = ({ ctx2d, pathState, outputToString = false}) => {
     },
   };
 
+  // setup aliases
   methods.m = methods.moveTo;
   methods.p = methods.pathTo;
-  methods.c = methods.controlAt;
+  methods.c = methods.setControl;
   methods.b = methods.branch;
 
   pathContext = Object.assign(Object.create(methods), { ctx2d });
