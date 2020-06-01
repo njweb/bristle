@@ -54,8 +54,10 @@ const bristle = ({ ctx2d, pathState, outputToString = false}) => {
     const t = getActiveTransform();
     const { branchDepth, transformStack } = bristleState;
     if (transformStack.length <= branchDepth + 1) {
+      // if there is not enough existing space on the transform stack, push a new matrix
       transformStack.push(multiplyMat2d(createMat2d(), nextTransform, t));
     } else {
+      // use an existing matrix on the transform stack
       multiplyMat2d(transformStack[branchDepth + 1], nextTransform, t);
     }
     bristleState.branchDepth += 1;
